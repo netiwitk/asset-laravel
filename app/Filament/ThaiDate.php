@@ -14,6 +14,27 @@ class ThaiDate
 {
     public static function format(mixed $value, bool $withTime = false): ?string
     {
+        return self::render($value, $withTime ? 'd MMM yyyy HH:mm' : 'd MMM yyyy');
+    }
+
+    /**
+     * e.g. "29 ก.ย." for chart labels.
+     */
+    public static function dayMonth(mixed $value): ?string
+    {
+        return self::render($value, 'd MMM');
+    }
+
+    /**
+     * e.g. "วันศุกร์ที่ 3 ตุลาคม 2569"
+     */
+    public static function long(mixed $value): ?string
+    {
+        return self::render($value, 'EEEEที่ d MMMM yyyy');
+    }
+
+    private static function render(mixed $value, string $pattern): ?string
+    {
         if (blank($value)) {
             return null;
         }
@@ -24,7 +45,7 @@ class ThaiDate
             IntlDateFormatter::NONE,
             'Asia/Bangkok',
             IntlDateFormatter::TRADITIONAL,
-            $withTime ? 'd MMM yyyy HH:mm' : 'd MMM yyyy',
+            $pattern,
         )->format(Carbon::parse($value));
     }
 

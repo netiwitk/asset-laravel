@@ -1,0 +1,275 @@
+/*
+ * Asset system look on top of Filament's CSS hooks (fi-*). Plain CSS, no build step.
+ * Every colour comes from the panel palette (--primary-*, --accent-*, --gray-*),
+ * so changing colors() in AdminPanelProvider re-themes everything, dark mode included.
+ */
+
+:root {
+    --asset-radius: 1rem;
+    --asset-grid: color-mix(in oklab, var(--gray-900) 5%, transparent);
+    --asset-glow: color-mix(in oklab, var(--primary-500) 16%, transparent);
+    --asset-glow-2: color-mix(in oklab, var(--accent-400) 14%, transparent);
+    --asset-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -14px rgb(15 23 42 / 0.18);
+    --asset-shadow-hover: 0 1px 2px rgb(15 23 42 / 0.05), 0 16px 36px -14px color-mix(in oklab, var(--primary-600) 35%, transparent);
+}
+
+.dark {
+    --asset-grid: color-mix(in oklab, white 4%, transparent);
+    --asset-glow: color-mix(in oklab, var(--primary-500) 14%, transparent);
+    --asset-glow-2: color-mix(in oklab, var(--accent-400) 8%, transparent);
+    --asset-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+    --asset-shadow-hover: 0 1px 2px rgb(0 0 0 / 0.35), 0 16px 36px -14px color-mix(in oklab, var(--primary-500) 40%, transparent);
+}
+
+/* ---------- Brand ---------- */
+
+.asset-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.asset-brand-mark {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.7rem;
+    color: white;
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    box-shadow: 0 6px 16px -6px color-mix(in oklab, var(--primary-600) 60%, transparent);
+}
+
+.asset-brand-mark::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 999px;
+    background: var(--accent-400);
+    border: 2px solid white;
+}
+
+.dark .asset-brand-mark::after {
+    border-color: var(--gray-900);
+}
+
+.asset-brand-mark svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.asset-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.asset-brand-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--gray-950);
+}
+
+.dark .asset-brand-name {
+    color: white;
+}
+
+.asset-brand-tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+/* ---------- Login and other simple pages ---------- */
+
+.fi-simple-layout {
+    background-color: var(--gray-50);
+    background-image:
+        radial-gradient(720px 440px at 88% -8%, var(--asset-glow), transparent 70%),
+        radial-gradient(620px 420px at -6% 108%, var(--asset-glow-2), transparent 70%),
+        linear-gradient(var(--asset-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--asset-grid) 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+}
+
+.dark .fi-simple-layout {
+    background-color: var(--gray-950);
+}
+
+.fi-simple-main {
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 30px 60px -28px color-mix(in oklab, var(--primary-700) 35%, transparent);
+}
+
+.fi-simple-header .asset-brand {
+    margin-bottom: 0.25rem;
+}
+
+/* ---------- App shell ---------- */
+
+.fi-body {
+    background-color: var(--gray-50);
+    background-image:
+        radial-gradient(900px 360px at 100% 0%, var(--asset-glow), transparent 70%),
+        radial-gradient(700px 300px at 0% 100%, var(--asset-glow-2), transparent 70%);
+    background-attachment: fixed;
+}
+
+.dark .fi-body {
+    background-color: var(--gray-950);
+}
+
+.fi-topbar-ctn .fi-topbar {
+    background: color-mix(in oklab, white 72%, transparent);
+    backdrop-filter: saturate(1.6) blur(12px);
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--gray-900) 7%, transparent);
+}
+
+.dark .fi-topbar-ctn .fi-topbar {
+    background: color-mix(in oklab, var(--gray-900) 72%, transparent);
+    box-shadow: 0 1px 0 color-mix(in oklab, white 7%, transparent);
+}
+
+.fi-sidebar {
+    background: color-mix(in oklab, white 70%, transparent);
+    backdrop-filter: blur(12px);
+    border-inline-end: 1px solid color-mix(in oklab, var(--gray-900) 7%, transparent);
+}
+
+.dark .fi-sidebar {
+    background: color-mix(in oklab, var(--gray-900) 60%, transparent);
+    border-inline-end-color: color-mix(in oklab, white 7%, transparent);
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 0.75rem;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: linear-gradient(90deg, color-mix(in oklab, var(--primary-500) 14%, transparent), color-mix(in oklab, var(--primary-500) 4%, transparent));
+    box-shadow: inset 3px 0 0 var(--primary-500);
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: var(--primary-700);
+    font-weight: 600;
+}
+
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: var(--primary-300);
+}
+
+.fi-sidebar-group-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ---------- Page header ---------- */
+
+.fi-header-heading {
+    letter-spacing: -0.01em;
+}
+
+.fi-header-subheading {
+    color: var(--gray-500);
+}
+
+/* ---------- Cards: sections, stats, tables, charts ---------- */
+
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-chart .fi-section,
+.fi-wi-stats-overview-stat {
+    border-radius: var(--asset-radius);
+    box-shadow: var(--asset-shadow);
+}
+
+.fi-wi-stats-overview-stat {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fi-wi-stats-overview-stat::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-500), var(--accent-400));
+    opacity: 0.85;
+}
+
+a.fi-wi-stats-overview-stat:hover,
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--asset-shadow-hover);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+}
+
+.fi-wi-stats-overview-stat-label-ctn .fi-icon {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.4rem;
+    border-radius: 0.6rem;
+    color: var(--primary-600);
+    background: color-mix(in oklab, var(--primary-500) 12%, transparent);
+}
+
+.dark .fi-wi-stats-overview-stat-label-ctn .fi-icon {
+    color: var(--primary-300);
+}
+
+/* Tables */
+
+.fi-ta-header-cell {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--gray-500);
+}
+
+.fi-ta-row {
+    transition: background-color 0.12s;
+}
+
+.fi-ta-row:hover {
+    background: color-mix(in oklab, var(--primary-500) 5%, transparent);
+}
+
+/* Badges as soft pills */
+
+.fi-badge {
+    border-radius: 999px;
+    padding-inline: 0.6rem;
+}
+
+/* Buttons: primary gets a gentle gradient */
+
+.fi-btn.fi-color-primary:not(.fi-outlined) {
+    background-image: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    box-shadow: 0 6px 16px -8px color-mix(in oklab, var(--primary-600) 70%, transparent);
+}
+
+.fi-btn.fi-color-primary:not(.fi-outlined):hover {
+    background-image: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-wi-stats-overview-stat,
+    .fi-ta-row,
+    .fi-sidebar-item-btn {
+        transition: none;
+    }
+}

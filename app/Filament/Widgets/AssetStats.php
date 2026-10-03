@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Enums\Availability;
 use App\Enums\Condition;
 use App\Enums\LoanStatus;
+use App\Enums\MovementType;
 use App\Filament\Resources\Assets\AssetResource;
 use App\Filament\Resources\Loans\LoanResource;
 use Filament\Support\Icons\Heroicon;
@@ -44,6 +45,7 @@ class AssetStats extends StatsOverviewWidget
         return [
             Stat::make('ทรัพย์สินในทะเบียน', number_format((int) $assets->in_register))
                 ->description('มูลค่ารวม ฿'.number_format((float) $assets->total_cost))
+                ->color('primary')
                 ->icon(Heroicon::OutlinedCube),
             Stat::make('พร้อมให้ยืม', number_format((int) $assets->ready))
                 ->description('ใช้งานได้และว่าง')
@@ -52,14 +54,18 @@ class AssetStats extends StatsOverviewWidget
             Stat::make('ถูกยืมอยู่', number_format((int) $assets->on_loan))
                 ->description($overdue > 0 ? "เกินกำหนดคืน {$overdue} รายการ" : 'ไม่มีรายการเกินกำหนด')
                 ->descriptionColor($overdue > 0 ? 'danger' : 'gray')
+                ->color('primary')
+                ->chart(array_values(LoansPerWeekChart::weeklyCounts(MovementType::Borrow)))
                 ->icon(Heroicon::OutlinedHandRaised),
             Stat::make('ซ่อม / ชำรุด', number_format((int) $assets->in_repair).' / '.number_format((int) $assets->waiting_repair))
                 ->description('กำลังซ่อม / ชำรุดรอส่งซ่อม')
                 ->color('warning')
+                ->chart(array_values(LoansPerWeekChart::weeklyCounts(MovementType::SendRepair)))
                 ->icon(Heroicon::OutlinedWrenchScrewdriver),
             Stat::make('คำขอรออนุมัติ', number_format($pending))
                 ->description('คำขอยืมที่ยังไม่ได้พิจารณา')
                 ->url(LoanResource::getUrl())
+                ->color('accent')
                 ->icon(Heroicon::OutlinedClipboardDocumentList),
         ];
     }

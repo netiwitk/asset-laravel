@@ -117,6 +117,23 @@ class DatabaseSeeder extends Seeder
 
         $pick = fn (string $tagPrefix, int $nth) => $assets->filter(fn (Asset $asset) => str_starts_with($asset->asset_tag, $tagPrefix))->values()[$nth];
 
+        // Eight weeks of everyday borrowing for the dashboard charts. These assets (COM 12-17, AV 9-14)
+        // are not used by the scenarios below, so each asset's history stays in time order.
+        $regulars = collect(range(12, 17))->map(fn (int $nth) => $pick('COM', $nth))
+            ->concat(collect(range(9, 14))->map(fn (int $nth) => $pick('AV', $nth)));
+        $borrowers = $others->concat([$staff]);
+        foreach ([0, 1, 2] as $round) {
+            foreach ($regulars as $k => $asset) {
+                $daysAgo = 56 - $round * 18 - $k;
+                $days = 2 + ($k + $round) % 4;
+                $loan = $request($asset, $borrowers[($k + $round) % $borrowers->count()], $daysAgo, $days, 'ใช้งานประจำ');
+                AssetLedger::approve($loan, $officer);
+                AssetLedger::handOver($loan, $officer);
+                $at($daysAgo - $days, 16);
+                AssetLedger::receiveReturn($loan, $officer, Condition::Usable);
+            }
+        }
+
         // Returned loans (history)
         foreach ([[0, 30, 'ประชุมนอกสถานที่'], [3, 20, 'อบรมพนักงานใหม่']] as [$nth, $daysAgo, $purpose]) {
             $loan = $request($pick('COM', $nth), $others[$nth % $others->count()], $daysAgo, 5, $purpose);

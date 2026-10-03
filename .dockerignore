@@ -8,6 +8,7 @@ storage/framework/cache/data/*
 storage/framework/sessions/*
 storage/framework/views/*
 public/js/filament
+public/css/app
 public/css/filament
 public/fonts/filament
 docs

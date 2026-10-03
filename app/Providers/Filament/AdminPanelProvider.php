@@ -2,11 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -28,11 +28,19 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('ระบบทรัพย์สิน')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->favicon(asset('favicon.svg'))
             ->font('IBM Plex Sans Thai')
+            // The whole palette: CSS (resources/css/filament/asset-theme.css) and charts read these.
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Blue,
+                'accent' => Color::Cyan,
+                'gray' => Color::Slate,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('17rem')
+            ->spa()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn () => config('app.demo') ? view('filament.demo-logins') : '',

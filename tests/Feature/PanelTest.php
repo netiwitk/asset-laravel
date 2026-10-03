@@ -16,7 +16,9 @@ use App\Filament\Resources\RepairOrders\Pages\ManageRepairOrders;
 use App\Filament\Resources\RepairOrders\RepairOrderResource;
 use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Filament\Resources\Users\UserResource;
+use App\Filament\Widgets\AssetsByCategoryChart;
 use App\Filament\Widgets\AssetStats;
+use App\Filament\Widgets\LoansPerWeekChart;
 use App\Filament\Widgets\RecentMovements;
 use App\Models\Asset;
 use App\Models\Category;
@@ -256,5 +258,12 @@ class PanelTest extends TestCase
         $this->actingAs($this->officer);
         Livewire::test(AssetStats::class)->assertSee('เกินกำหนดคืน 1 รายการ');
         Livewire::test(RecentMovements::class)->assertCanSeeTableRecords($asset->movements);
+        Livewire::test(LoansPerWeekChart::class)->assertOk();
+        Livewire::test(AssetsByCategoryChart::class)->assertOk();
+
+        $weeks = LoansPerWeekChart::weeklyCounts(MovementType::Borrow);
+        $this->assertCount(8, $weeks);
+        $this->assertSame(1, array_sum($weeks));
+        $this->assertSame(1, end($weeks), 'This week\'s hand-over lands in the last bucket.');
     }
 }
