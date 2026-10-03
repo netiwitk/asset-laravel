@@ -21,6 +21,7 @@
 นอกจากนี้ยังมี:
 - **ประวัติการเคลื่อนไหว** ของทรัพย์สินแต่ละชิ้น ตั้งแต่ยกยอดเข้าระบบ
 - **บันทึกการแก้ไข** (เฉพาะผู้ดูแลระบบ) บอกว่าใครแก้ข้อมูลอะไร จากค่าไหนเป็นค่าไหน เช่น ราคา บทบาทผู้ใช้
+- **มูลค่าคงเหลือ** หลังหักค่าเสื่อมราคาแบบเส้นตรงรายวัน ตามอายุการใช้งานของหมวดหมู่ คงเหลือขั้นต่ำ 1 บาทจนกว่าจะจำหน่าย
 - **dashboard** สรุปตามสถานะ
 - **ตัวกรองรายการเกินกำหนดคืน**
 - **วันที่แสดงเป็น พ.ศ. ตามเวลาไทย**
@@ -97,10 +98,11 @@ git push origin main:deploy
 php artisan test
 ```
 
-มี 40 test แบ่งเป็น 4 กลุ่ม:
+มี 43 test แบ่งเป็น 5 กลุ่ม:
 - [`AssetLedgerTest`](tests/Feature/AssetLedgerTest.php): เช็กว่ากฎใน database ทำงานจริง โดยบางข้อเขียนข้อมูลตรงเข้า database ข้ามโค้ดแอป
 - [`PanelTest`](tests/Feature/PanelTest.php): กดปุ่มจริงใน Filament และเช็กสิทธิ์ของแต่ละบทบาท
 - [`AuditLogTest`](tests/Feature/AuditLogTest.php): บันทึกเฉพาะการแก้ไขจริง ไม่บันทึกตอน logout ซ่อนรหัสผ่าน และแก้ย้อนหลังไม่ได้
+- [`DepreciationTest`](tests/Feature/DepreciationTest.php): ค่าเสื่อมราคาก่อนซื้อ กลางอายุ หมดอายุ และหลังจำหน่าย
 - `ThaiDate`: เช็กการแสดงวันที่เป็น พ.ศ.
 
 GitHub Actions ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)) รัน test ทั้งหมดและตรวจ code style ด้วย Pint ทุกครั้งที่ push

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Availability;
 use App\Enums\Condition;
 use App\Enums\LoanStatus;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -75,6 +76,32 @@ class Asset extends Model
     public function canBeDeleted(): bool
     {
         return ! $this->trashed() && $this->availability === Availability::Available && ! $this->hasApprovedLoan();
+    }
+
+    /**
+     * Straight-line depreciation by day. The value stops at 1 baht (ซาก), as Thai government
+     * asset registers keep a fully depreciated asset on the books until it is disposed.
+     * Null when the cost, acquisition date or the category's useful life is missing.
+     * Needs the category relation loaded.
+     */
+    public function bookValue(?CarbonInterface $on = null): ?string
+    {
+        $years = $this->category->useful_life_years;
+
+        if ($this->cost === null || $this->acquired_on === null || ! $years) {
+            return null;
+        }
+        if ($this->condition === Condition::Disposed) {
+            return '0.00';
+        }
+
+        // Whole satang, so the result is exact.
+        $cost = (int) round($this->cost * 100);
+        $lifeDays = (int) $this->acquired_on->diffInDays($this->acquired_on->copy()->addYears($years));
+        $usedDays = (int) max(0, $this->acquired_on->diffInDays($on ?? today()));
+        $value = max(min($cost, 100), $cost - intdiv($cost * $usedDays, $lifeDays));
+
+        return number_format($value / 100, 2, '.', '');
     }
 
     /**

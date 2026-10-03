@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Assets\Schemas;
 
 use App\Filament\ThaiDate;
+use App\Models\Asset;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -26,6 +27,14 @@ class AssetInfolist
                         TextEntry::make('serial_no')->label('Serial No.')->placeholder('-'),
                         TextEntry::make('acquired_on')->label('วันที่ได้มา')->formatStateUsing(ThaiDate::formatter())->placeholder('-'),
                         TextEntry::make('cost')->label('ราคา')->money('THB')->placeholder('-'),
+                        TextEntry::make('book_value')
+                            ->label('มูลค่าคงเหลือ')
+                            ->state(fn (Asset $record): ?string => $record->bookValue())
+                            ->money('THB')
+                            ->placeholder('-')
+                            ->helperText(fn (Asset $record): ?string => $record->bookValue() === null
+                                ? 'คำนวณได้เมื่อมีราคา วันที่ได้มา และอายุการใช้งานของหมวดหมู่'
+                                : 'ค่าเสื่อมราคาแบบเส้นตรง อายุ '.$record->category->useful_life_years.' ปี คงเหลือขั้นต่ำ 1 บาท'),
                         TextEntry::make('location_note')->label('ที่ตั้ง')->placeholder('-')->columnSpanFull(),
                     ]),
                 Section::make('สถานะ')
