@@ -30,6 +30,8 @@ class RecentMovements extends TableWidget
                 ->latest('id'))
             // TableWidget defaults to simple (next/previous only); show page numbers and the total.
             ->paginationMode(PaginationMode::Default)
+            ->emptyStateHeading('ยังไม่มีความเคลื่อนไหว')
+            ->emptyStateDescription('การยืม คืน ส่งซ่อม และโอนย้ายจะแสดงที่นี่')
             ->paginated([10])
             ->defaultPaginationPageOption(10)
             ->columns([

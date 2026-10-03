@@ -16,6 +16,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -40,7 +41,13 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('17rem')
             ->spa()
+            ->unsavedChangesAlerts()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->renderHook(
+                PanelsRenderHook::HEAD_START,
+                fn () => new HtmlString('<meta name="description" content="ระบบบริหารทรัพย์สิน: ทะเบียนครุภัณฑ์ ยืม–คืน ส่งซ่อม โอนย้าย และจำหน่าย">'),
+            )
+            ->renderHook(PanelsRenderHook::BODY_START, fn () => view('filament.offline'))
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
                 fn () => config('app.demo') ? view('filament.demo-logins') : '',

@@ -20,4 +20,4 @@ Route::get('/demo/{account}', function (string $account) {
     $to = (string) request('to');
 
     return redirect(str_starts_with($to, '/admin') ? $to : '/admin');
-})->whereIn('account', User::DEMO_LOGINS)->name('demo.login');
+})->whereIn('account', User::DEMO_LOGINS)->middleware('throttle:20,1')->name('demo.login');

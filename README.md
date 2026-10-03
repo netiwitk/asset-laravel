@@ -91,10 +91,20 @@ git push origin main:deploy
 php artisan test
 ```
 
-มี 31 test แบ่งเป็น 3 กลุ่ม:
+มี 34 test แบ่งเป็น 3 กลุ่ม:
 - [`AssetLedgerTest`](tests/Feature/AssetLedgerTest.php): เช็กว่ากฎใน database ทำงานจริง โดยบางข้อเขียนข้อมูลตรงเข้า database ข้ามโค้ดแอป
 - [`PanelTest`](tests/Feature/PanelTest.php): กดปุ่มจริงใน Filament และเช็กสิทธิ์ของแต่ละบทบาท
 - `ThaiDate`: เช็กการแสดงวันที่เป็น พ.ศ.
+
+ทดสอบใน browser จริงด้วย [`tests/Browser/smoke.mjs`](tests/Browser/smoke.mjs) ต้องใช้ Node 22 ขึ้นไปและ Chrome สคริปต์จะ:
+- เปิดทุกหน้าตามบทบาท แล้วตรวจว่าไม่มี console error และไม่มี request ที่ล้มเหลว
+- ตรวจว่า ESC ปิด modal ได้
+- ตรวจว่าปุ่ม back/forward ของ browser ทำงานถูก
+- ตรวจหน้า 403 และ 404
+
+ใช้ได้ทั้งกับเครื่อง dev และเว็บจริง (`node tests/Browser/smoke.mjs <url>`)
+
+checklist ที่ใช้ตรวจก่อน deploy อยู่ที่ [`docs/QA-CHECKLIST.md`](docs/QA-CHECKLIST.md)
 
 ## ข้อจำกัดที่รู้อยู่
 

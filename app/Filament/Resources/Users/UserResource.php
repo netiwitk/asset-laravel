@@ -70,7 +70,14 @@ class UserResource extends Resource
                     ->minLength(8)
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->dehydrated(fn (?string $state): bool => filled($state))
-                    ->helperText(fn (string $operation): ?string => $operation === 'edit' ? 'เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน' : null),
+                    ->helperText(fn (string $operation): ?string => $operation === 'edit' ? 'เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน' : null)
+                    ->confirmed(),
+                TextInput::make('password_confirmation')
+                    ->label('ยืนยันรหัสผ่าน')
+                    ->password()
+                    ->revealable()
+                    ->requiredWith('password')
+                    ->dehydrated(false),
                 Toggle::make('is_active')
                     ->label('ใช้งานอยู่')
                     ->helperText('ปิดแทนการลบ ผู้ใช้ที่ปิดแล้วจะเข้าระบบไม่ได้ แต่ประวัติยังอยู่ครบ')

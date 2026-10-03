@@ -11,6 +11,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -22,17 +23,23 @@ class AssetsTable
     {
         return $table
             ->defaultSort('asset_tag')
+            ->emptyStateIcon(Heroicon::OutlinedCube)
+            ->emptyStateHeading('ไม่พบทรัพย์สิน')
+            ->emptyStateDescription('ลองเปลี่ยนคำค้นหา ล้างตัวกรอง หรือเลือกแท็บ "ทั้งหมด"')
             ->columns([
                 TextColumn::make('asset_tag')
                     ->visibleFrom('sm')
                     ->label('เลขครุภัณฑ์')
                     ->fontFamily('mono')
                     ->color('gray')
+                    ->copyable()
+                    ->copyMessage('คัดลอกเลขครุภัณฑ์แล้ว')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
                     ->label('ชื่อทรัพย์สิน')
                     ->weight(FontWeight::Medium)
+                    ->wrap()
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record): ?string => $record->location_note),

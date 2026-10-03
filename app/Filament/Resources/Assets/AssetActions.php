@@ -40,7 +40,7 @@ class AssetActions
             ->color('warning')
             ->visible(fn (Asset $record): bool => self::canChange($record) && $record->availability === Availability::Available)
             ->schema([
-                TextInput::make('vendor')->label('ร้าน / ผู้รับซ่อม'),
+                TextInput::make('vendor')->label('ร้าน / ผู้รับซ่อม')->maxLength(255),
                 DatePicker::make('expected_return_on')->label('คาดว่าจะได้คืน')->minDate(today())->live()->hint(ThaiDate::hint()),
                 Textarea::make('note')->label('อาการเสีย'),
             ])
@@ -64,7 +64,7 @@ class AssetActions
             ->visible(fn (Model $record): bool => self::canChange($assetOf($record)) && $assetOf($record)->availability === Availability::InRepair)
             ->schema([
                 self::conditionSelect('ผลการซ่อม'),
-                TextInput::make('cost')->label('ค่าซ่อม')->numeric()->minValue(0)->prefix('฿'),
+                TextInput::make('cost')->label('ค่าซ่อม')->numeric()->minValue(0)->maxValue(999999999999.99)->prefix('฿'),
                 Textarea::make('note')->label('บันทึก'),
             ])
             ->action(fn (Model $record, array $data, Action $action) => self::run($action, fn () => AssetLedger::receiveFromRepair(

@@ -82,11 +82,15 @@ class LoanResource extends Resource
     {
         return $table
             ->defaultSort('id', 'desc')
+            ->emptyStateIcon(Heroicon::OutlinedClipboardDocumentList)
+            ->emptyStateHeading('ยังไม่มีคำขอยืมในหมวดนี้')
+            ->emptyStateDescription('กด "ขอยืมทรัพย์สิน" ด้านบนเพื่อสร้างคำขอใหม่ หรือเลือกแท็บอื่น')
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['asset', 'borrower', 'approver']))
             ->columns([
                 TextColumn::make('asset.name')
                     ->label('ทรัพย์สิน')
                     ->weight(FontWeight::Medium)
+                    ->wrap()
                     ->description(fn (Loan $record): string => $record->asset->asset_tag)
                     ->searchable(['name', 'asset_tag']),
                 TextColumn::make('borrower.name')

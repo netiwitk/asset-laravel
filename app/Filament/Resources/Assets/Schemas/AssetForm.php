@@ -27,6 +27,7 @@ class AssetForm
                     ->schema([
                         TextInput::make('asset_tag')
                             ->label('เลขครุภัณฑ์')
+                            ->autofocus()
                             ->required()
                             ->maxLength(64)
                             ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule): Unique => $rule->withoutTrashed()),
@@ -49,7 +50,8 @@ class AssetForm
                             ->searchable()
                             ->preload(),
                         TextInput::make('serial_no')
-                            ->label('Serial No.'),
+                            ->label('Serial No.')
+                            ->maxLength(255),
                         DatePicker::make('acquired_on')
                             ->label('วันที่ได้มา')
                             ->maxDate(today())
@@ -59,9 +61,11 @@ class AssetForm
                             ->label('ราคา')
                             ->numeric()
                             ->minValue(0)
+                            ->maxValue(999999999999.99)
                             ->prefix('฿'),
                         TextInput::make('location_note')
                             ->label('ที่ตั้ง')
+                            ->maxLength(255)
                             ->placeholder('เช่น อาคาร A ชั้น 3 ห้อง 301'),
                     ]),
             ]);

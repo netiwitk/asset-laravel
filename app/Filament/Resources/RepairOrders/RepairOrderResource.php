@@ -52,11 +52,15 @@ class RepairOrderResource extends Resource
     {
         return $table
             ->defaultSort('sent_on', 'desc')
+            ->emptyStateIcon(Heroicon::OutlinedWrenchScrewdriver)
+            ->emptyStateHeading('ไม่มีงานซ่อมในหมวดนี้')
+            ->emptyStateDescription('ส่งซ่อมได้จากหน้ารายละเอียดทรัพย์สิน ปุ่ม "ส่งซ่อม"')
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['asset', 'requester']))
             ->columns([
                 TextColumn::make('asset.name')
                     ->label('ทรัพย์สิน')
                     ->weight(FontWeight::Medium)
+                    ->wrap()
                     ->description(fn (RepairOrder $record): string => $record->asset->asset_tag)
                     ->url(fn (RepairOrder $record): string => AssetResource::getUrl('view', ['record' => $record->asset]))
                     ->searchable(['name', 'asset_tag']),

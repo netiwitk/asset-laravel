@@ -152,7 +152,7 @@ class PanelTest extends TestCase
         Livewire::test(ManageUsers::class)
             ->callAction(CreateAction::class, data: [
                 'name' => 'ผู้ใช้ใหม่', 'email' => 'new@demo.test', 'department_id' => $this->finance->id,
-                'role' => Role::Officer->value, 'password' => 'secret-pass', 'is_active' => true,
+                'role' => Role::Officer->value, 'password' => 'secret-pass', 'password_confirmation' => 'secret-pass', 'is_active' => true,
             ])
             ->assertHasNoActionErrors();
 
@@ -286,5 +286,31 @@ class PanelTest extends TestCase
             ->set('activeTab', 'overdue')
             ->assertCanSeeTableRecords([$loan])
             ->assertCanNotSeeTableRecords([$pending]);
+    }
+
+    public function test_user_form_checks_password_confirmation_trims_text_and_speaks_thai(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => Role::Admin, 'department_id' => $this->it->id]));
+
+        $form = Livewire::test(ManageUsers::class)
+            ->callAction(CreateAction::class, data: [
+                'name' => 'ผู้ใช้', 'email' => 'mismatch@demo.test', 'department_id' => $this->finance->id,
+                'role' => Role::Staff->value, 'password' => 'secret-pass', 'password_confirmation' => 'other-pass',
+            ])
+            ->assertHasActionErrors(['password' => 'confirmed']);
+        $this->assertSame('รหัสผ่าน กับช่องยืนยันไม่ตรงกัน', $form->errors()->first('mountedActions.0.data.password'));
+        $this->assertDatabaseMissing('users', ['email' => 'mismatch@demo.test']);
+
+        Livewire::test(CreateAsset::class)
+            ->fillForm(['asset_tag' => '  COM-68-0100  ', 'name' => ' iPad ', 'category_id' => $this->category->id, 'department_id' => $this->it->id])
+            ->call('create')
+            ->assertHasNoFormErrors();
+        $this->assertDatabaseHas('assets', ['asset_tag' => 'COM-68-0100', 'name' => 'iPad']);
+    }
+
+    public function test_error_pages_are_thai(): void
+    {
+        $this->get('/admin/does-not-exist')->assertNotFound()->assertSee('ไม่พบหน้าที่ต้องการ');
+        $this->actingAs($this->staff)->get(UserResource::getUrl())->assertForbidden()->assertSee('ไม่มีสิทธิ์เข้าถึงหน้านี้');
     }
 }

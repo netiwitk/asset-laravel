@@ -530,6 +530,22 @@ a.fi-wi-stats-overview-stat:hover,
     outline-offset: 2px;
 }
 
+/* Offline banner (resources/views/filament/offline.blade.php). */
+.asset-offline {
+    position: fixed;
+    inset: auto 1rem 1rem 1rem;
+    z-index: 60;
+    max-width: 32rem;
+    margin-inline: auto;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: white;
+    background: var(--gray-900);
+    box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.4);
+}
+
 /* ---------- Small screens ---------- */
 
 @media (max-width: 767px) {
