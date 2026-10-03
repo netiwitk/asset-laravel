@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName('ระบบทรัพย์สิน')
             ->brandLogo(fn () => view('filament.brand'))
-            ->favicon(asset('favicon.svg'))
+            ->favicon(fn (): string => asset('favicon.svg'))
             ->font('IBM Plex Sans Thai')
             // The whole palette: CSS (resources/css/filament/asset-theme.css) and charts read these.
             ->colors([

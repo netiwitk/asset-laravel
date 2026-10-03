@@ -91,7 +91,7 @@ git push origin main:deploy
 php artisan test
 ```
 
-มี 34 test แบ่งเป็น 3 กลุ่ม:
+มี 35 test แบ่งเป็น 3 กลุ่ม:
 - [`AssetLedgerTest`](tests/Feature/AssetLedgerTest.php): เช็กว่ากฎใน database ทำงานจริง โดยบางข้อเขียนข้อมูลตรงเข้า database ข้ามโค้ดแอป
 - [`PanelTest`](tests/Feature/PanelTest.php): กดปุ่มจริงใน Filament และเช็กสิทธิ์ของแต่ละบทบาท
 - `ThaiDate`: เช็กการแสดงวันที่เป็น พ.ศ.

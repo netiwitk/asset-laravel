@@ -11,7 +11,7 @@ Checklist มาตรฐานสำหรับเว็บแอป ปรั
 
 **ทดสอบล่าสุด**
 
-- `php artisan test`: 34 tests
+- `php artisan test`: 35 tests
 - `node tests/Browser/smoke.mjs`: 14 ขั้นตอน ทดสอบกับเครื่อง dev, Docker image (production) และเว็บจริงหลัง deploy
 
 ---
@@ -229,21 +229,21 @@ Checklist มาตรฐานสำหรับเว็บแอป ปรั
 - ✅ **ไม่มี debug log ที่ไม่จำเป็น**
 - ✅ **ไม่มี lorem ipsum**
 - ✅ **ไม่มีปุ่มที่กดไม่ได้ / dead link**: smoke test เปิดทุกหน้าตามบทบาท
-- ✅ **Favicon / title**
+- ✅🛠 **Favicon / title**: favicon เคยถูกสร้างเป็นลิงก์ `http://` บนเว็บจริง (Render รับ HTTPS ที่ proxy) จน browser block เพราะเป็น mixed content แก้ให้สร้าง URL ตอน render หน้า และมี test ครอบไว้แล้ว
 - 🛠 **Meta description**
 - 🛠 **404**
 - ✅ **Loading / empty / error / responsive**
 - ✅ **Test login / logout / CRUD / permission**: `php artisan test`
 - ✅ **Test refresh page**
 - ✅ **Test production**: smoke test กับ Docker image ที่ตั้ง `APP_ENV=production`
-- ✅ **Test หลัง deploy จริง**: `node tests/Browser/smoke.mjs https://asset-laravel.onrender.com`
+- ✅ **Test หลัง deploy จริง**: `node tests/Browser/smoke.mjs https://asset-laravel.onrender.com` (รอบแรกเจอปัญหา favicon ข้างบน ซึ่ง Docker ในเครื่องจับไม่ได้เพราะไม่มี HTTPS proxy)
 
 ---
 
 ## วิธีทดสอบ
 
 ```bash
-php artisan test                                       # 34 tests: กฎใน database, การกดปุ่มจริงใน UI, สิทธิ์, ข้อความภาษาไทย
+php artisan test                                       # 35 tests: กฎใน database, การกดปุ่มจริงใน UI, สิทธิ์, ข้อความภาษาไทย
 php artisan serve &                                    # ต้องตั้ง APP_DEMO=true
 node tests/Browser/smoke.mjs http://127.0.0.1:8000     # เปิด Chrome จริง: ทุกหน้า, ESC ปิด modal, back/forward, 403/404
 ```

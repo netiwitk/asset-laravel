@@ -313,4 +313,13 @@ class PanelTest extends TestCase
         $this->get('/admin/does-not-exist')->assertNotFound()->assertSee('ไม่พบหน้าที่ต้องการ');
         $this->actingAs($this->staff)->get(UserResource::getUrl())->assertForbidden()->assertSee('ไม่มีสิทธิ์เข้าถึงหน้านี้');
     }
+
+    public function test_asset_urls_follow_the_https_proxy(): void
+    {
+        // Render terminates TLS at its proxy; an http favicon is blocked as mixed content.
+        $this->get('/admin/login', ['X-Forwarded-Proto' => 'https'])
+            ->assertOk()
+            ->assertSee('favicon.svg')
+            ->assertDontSee('href="http://', false);
+    }
 }
