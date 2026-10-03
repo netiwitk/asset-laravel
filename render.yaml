@@ -1,0 +1,22 @@
+# Render Blueprint: the demo deploys only from the "deploy" branch,
+# which a GitHub ruleset lets only the repository admin update.
+services:
+  - type: web
+    name: asset-laravel
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: deploy
+    autoDeploy: true
+    healthCheckPath: /up
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_DEMO
+        value: "true"
+      - key: APP_LOCALE
+        value: th
+      - key: LOG_CHANNEL
+        value: stderr

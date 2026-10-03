@@ -33,16 +33,17 @@ class DatabaseSeeder extends Seeder
         $fin = $departments[0];
         $it = $departments[1];
 
-        $admin = User::factory()->create(['name' => 'ผู้ดูแลระบบ', 'email' => 'admin@demo.test', 'role' => Role::Admin, 'department_id' => $it->id]);
-        $officer = User::factory()->create(['name' => 'สมศรี พัสดุดี', 'email' => 'officer@demo.test', 'role' => Role::Officer, 'department_id' => $fin->id]);
-        $staff = User::factory()->create(['name' => 'สมชาย ใจดี', 'email' => 'staff@demo.test', 'role' => Role::Staff, 'department_id' => $it->id]);
+        // User::create, not factories: the demo image is built without dev dependencies (no Faker).
+        // The password cast hashes 'password' for every demo account.
+        $demoUser = fn (string $name, string $email, Role $role, Department $department): User => User::create([
+            'name' => $name, 'email' => $email, 'password' => 'password', 'role' => $role, 'department_id' => $department->id,
+        ]);
+
+        $demoUser('ผู้ดูแลระบบ', 'admin@demo.test', Role::Admin, $it);
+        $officer = $demoUser('สมศรี พัสดุดี', 'officer@demo.test', Role::Officer, $fin);
+        $staff = $demoUser('สมชาย ใจดี', 'staff@demo.test', Role::Staff, $it);
         $others = collect(['วิภา รักงาน', 'ธนพล มั่นคง', 'กมล ศรีสุข', 'ปวีณา ทองดี'])
-            ->map(fn (string $name, int $i) => User::factory()->create([
-                'name' => $name,
-                'email' => 'user'.($i + 1).'@demo.test',
-                'role' => Role::Staff,
-                'department_id' => $departments[$i % $departments->count()]->id,
-            ]));
+            ->map(fn (string $name, int $i) => $demoUser($name, 'user'.($i + 1).'@demo.test', Role::Staff, $departments[$i % $departments->count()]));
 
         $categories = collect([
             'COM' => ['คอมพิวเตอร์และอุปกรณ์', 5, ['Notebook Dell Latitude 5450', 'Notebook Lenovo ThinkPad E14', 'คอมพิวเตอร์ตั้งโต๊ะ HP ProDesk', 'จอภาพ Dell 24 นิ้ว', 'iPad Air 11 นิ้ว', 'เครื่องพิมพ์ Brother Laser']],

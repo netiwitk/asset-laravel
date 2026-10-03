@@ -66,6 +66,23 @@ php artisan serve
 ถ้าตั้ง `APP_DEMO=true` ใน `.env` หน้า login จะมีปุ่มเข้าใช้ทันทีแยกตามบทบาท และระบบจะ reset ข้อมูลตัวอย่างทุกคืน
 **ห้ามเปิดโหมดนี้กับข้อมูลจริง**
 
+## Deploy (demo)
+
+demo รันบน [Render](https://render.com) แผนฟรี ตั้งค่าทั้งหมดอยู่ใน repo:
+- [`render.yaml`](render.yaml): Blueprint ของ Render
+- [`Dockerfile`](Dockerfile): image ที่ใช้ FrankenPHP รัน Laravel
+- [`docker/start.sh`](docker/start.sh): seed ข้อมูลตัวอย่างใหม่ทุกครั้งที่ server เริ่ม เพราะแผนฟรีไม่มี disk ถาวร ข้อมูลจึง reset เองทุกครั้งที่ server ตื่น
+
+**Render deploy เฉพาะ branch `deploy`** branch นี้มี GitHub ruleset ห้ามทุกคน push ลบ หรือ force-push ยกเว้น admin ของ repo
+
+ขั้นตอน deploy:
+
+```bash
+git push origin main:deploy
+```
+
+แผนฟรีจะหลับเมื่อไม่มีคนเข้า 15 นาที คนแรกที่เข้ามาหลังจากนั้นต้องรอประมาณ 1 นาที
+
 ## Test
 
 ```bash
