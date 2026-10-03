@@ -1,7 +1,10 @@
 # Demo image for Render (free plan): FrankenPHP serves Laravel, SQLite lives inside the container.
 FROM dunglas/frankenphp:1-php8.3
 
-RUN install-php-extensions intl pdo_sqlite zip opcache
+RUN install-php-extensions intl pdo_sqlite zip opcache \
+    # The official image gives frankenphp cap_net_bind_service (for ports < 1024). Render's runtime
+    # refuses to exec binaries with file capabilities ("Operation not permitted"); we listen on $PORT.
+    && setcap -r /usr/local/bin/frankenphp
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
