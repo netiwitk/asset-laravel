@@ -142,7 +142,7 @@ await run('404 page is the themed Thai page', async () => {
 // ---- admin journey ----
 await run('admin: settings pages load clean', async () => {
   await go('/demo/admin');
-  for (const path of ['/admin/users', '/admin/departments', '/admin/categories']) {
+  for (const path of ['/admin/users', '/admin/departments', '/admin/categories', '/admin/audit-logs']) {
     const s = await go(path);
     if (s !== 200) throw new Error(`${path} status ${s}`);
   }
