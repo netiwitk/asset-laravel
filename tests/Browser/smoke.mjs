@@ -13,9 +13,13 @@ import { join } from 'node:path';
 const base = (process.argv[2] ?? 'http://127.0.0.1:8123').replace(/\/$/, '');
 const CHROME = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PORT = Number(process.env.SMOKE_PORT ?? 9444);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Render's free plan sleeps when idle and answers 503 while waking; wait (up to ~3 min) for the app itself.
+for (let i = 0; i < 36 && (await fetch(`${base}/up`).then((r) => r.status, () => 0)) !== 200; i++) await sleep(5000);
+
 const profile = mkdtempSync(join(process.env.SMOKE_TMP ?? tmpdir(), 'smoke-'));
 const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, '--window-size=1366,900', 'about:blank'], { stdio: 'ignore' });
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let ws;
 for (let i = 0; i < 50 && !ws; i++) {
