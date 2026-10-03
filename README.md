@@ -1,5 +1,7 @@
 # ระบบบริหารทรัพย์สิน
 
+[![tests](https://github.com/netiwitk/asset-laravel/actions/workflows/tests.yml/badge.svg)](https://github.com/netiwitk/asset-laravel/actions/workflows/tests.yml)
+
 ระบบทะเบียนครุภัณฑ์สำหรับองค์กร: ลงทะเบียน ยืม–คืน ส่งซ่อม โอนย้ายหน่วยงาน และจำหน่าย แยกสิทธิ์ 3 บทบาท
 
 **Laravel 13 · Filament 5 · SQLite · PHPUnit**
@@ -95,6 +97,8 @@ php artisan test
 - [`AssetLedgerTest`](tests/Feature/AssetLedgerTest.php): เช็กว่ากฎใน database ทำงานจริง โดยบางข้อเขียนข้อมูลตรงเข้า database ข้ามโค้ดแอป
 - [`PanelTest`](tests/Feature/PanelTest.php): กดปุ่มจริงใน Filament และเช็กสิทธิ์ของแต่ละบทบาท
 - `ThaiDate`: เช็กการแสดงวันที่เป็น พ.ศ.
+
+GitHub Actions ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)) รัน test ทั้งหมดและตรวจ code style ด้วย Pint ทุกครั้งที่ push
 
 ทดสอบใน browser จริงด้วย [`tests/Browser/smoke.mjs`](tests/Browser/smoke.mjs) ต้องใช้ Node 22 ขึ้นไปและ Chrome สคริปต์จะ:
 - เปิดทุกหน้าตามบทบาท แล้วตรวจว่าไม่มี console error และไม่มี request ที่ล้มเหลว
