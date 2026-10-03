@@ -13,6 +13,7 @@ use App\Services\AssetLedger;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Demo data. Every status change goes through AssetLedger, exactly like the UI,
@@ -189,5 +190,12 @@ class DatabaseSeeder extends Seeder
         AssetLedger::transfer($moved, $officer, $target, 'ย้ายตามโครงสร้างใหม่');
         $at(28, 11);
         AssetLedger::dispose($pick('OFF', 12), $officer, 'ชำรุดเกินซ่อม มติคณะกรรมการ');
+
+        // A price correction by the officer, so the admin's audit page has an edit to show.
+        // Signed in last and signed out right after: every row written meanwhile is credited to them.
+        $at(5, 14);
+        Auth::setUser($officer);
+        $pick('COM', 2)->update(['cost' => 25_900, 'location_note' => 'อาคาร B ชั้น 2 ห้อง 204']);
+        Auth::forgetUser();
     }
 }

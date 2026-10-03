@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Asset;
+use App\Models\AuditLog;
+use App\Models\Category;
+use App\Models\Department;
+use App\Models\User;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Assets\Css;
@@ -38,5 +43,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Surface N+1 queries while developing and testing; production stays lenient.
         Model::preventLazyLoading(! $this->app->isProduction());
+
+        // Audit trail for master data (see AuditLog). Loans and repair orders carry their own actor columns.
+        foreach ([Asset::class, User::class, Category::class, Department::class] as $model) {
+            foreach (['created', 'updated', 'deleted'] as $event) {
+                $model::{$event}(fn (Model $record) => AuditLog::record($record, $event));
+            }
+        }
+        Asset::restored(fn (Asset $asset) => AuditLog::record($asset, 'restored'));
     }
 }

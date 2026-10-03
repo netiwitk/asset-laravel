@@ -9,8 +9,11 @@ use App\Enums\MovementType;
 use App\Enums\Role;
 use App\Filament\Resources\Assets\AssetResource;
 use App\Filament\Resources\Assets\Pages\CreateAsset;
+use App\Filament\Resources\Assets\Pages\EditAsset;
 use App\Filament\Resources\Assets\Pages\ListAssets;
 use App\Filament\Resources\Assets\Pages\ViewAsset;
+use App\Filament\Resources\AuditLogs\AuditLogResource;
+use App\Filament\Resources\AuditLogs\Pages\ManageAuditLogs;
 use App\Filament\Resources\Loans\Pages\ManageLoans;
 use App\Filament\Resources\RepairOrders\Pages\ManageRepairOrders;
 use App\Filament\Resources\RepairOrders\RepairOrderResource;
@@ -21,6 +24,7 @@ use App\Filament\Widgets\AssetStats;
 use App\Filament\Widgets\LoansPerWeekChart;
 use App\Filament\Widgets\RecentMovements;
 use App\Models\Asset;
+use App\Models\AuditLog;
 use App\Models\Category;
 use App\Models\Department;
 use App\Models\Loan;
@@ -30,6 +34,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -208,6 +213,40 @@ class PanelTest extends TestCase
 
         $this->assertSoftDeleted($idle);
         $this->assertNotSoftDeleted($onLoan);
+
+        Livewire::test(ListAssets::class)
+            ->filterTable('trashed', false)
+            ->callTableBulkAction(RestoreBulkAction::class, [$idle]);
+
+        // Bulk actions must go through each model, or the audit trail silently misses them.
+        $this->assertSame(
+            [[$idle->id, 'deleted'], [$idle->id, 'restored']],
+            AuditLog::query()->whereIn('event', ['updated', 'deleted', 'restored'])->orderBy('id')->get()
+                ->map(fn (AuditLog $log): array => [$log->auditable_id, $log->event])->all(),
+        );
+    }
+
+    public function test_admin_sees_who_changed_an_assets_price_and_other_roles_cannot(): void
+    {
+        $asset = AssetLedger::register(['asset_tag' => 'COM-68-0001', 'name' => 'Notebook', 'category_id' => $this->category->id, 'cost' => 12000], $this->finance->id, $this->officer);
+        $removed = $this->asset($this->finance, 'COM-68-0002');
+
+        $this->actingAs($this->officer);
+        Livewire::test(EditAsset::class, ['record' => $asset->id])
+            ->fillForm(['cost' => '15000', 'custodian_id' => $this->staff->id])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $admin = User::factory()->create(['role' => Role::Admin, 'department_id' => $this->it->id]);
+        $this->actingAs($admin);
+        $removed->delete();
+        $this->staff->update(['role' => Role::Officer]);
+
+        Livewire::test(ManageAuditLogs::class)
+            ->assertSee(['ราคา: 12000.00 → 15000.00', 'ผู้รับผิดชอบ: — → '.$this->staff->name, $this->officer->name])
+            ->assertSee(['ทรัพย์สิน · COM-68-0002 Notebook', 'บทบาท: พนักงาน → เจ้าหน้าที่พัสดุ']);
+
+        $this->actingAs($this->officer)->get(AuditLogResource::getUrl())->assertForbidden();
     }
 
     public function test_restore_is_disabled_when_the_tag_was_reused(): void
