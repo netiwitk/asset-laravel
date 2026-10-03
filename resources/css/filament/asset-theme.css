@@ -381,6 +381,53 @@ a.fi-wi-stats-overview-stat:hover,
     color: var(--primary-300);
 }
 
+/* Pagination bar: summary on the left; "per page" and the page numbers together on the right. */
+.fi-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+}
+
+.fi-pagination-overview {
+    margin-inline-end: auto;
+    font-size: 0.8125rem;
+    color: var(--gray-500);
+}
+
+.fi-pagination-records-per-page-select .fi-input-wrp {
+    background: transparent;
+    box-shadow: none;
+}
+
+.fi-pagination-records-per-page-select .fi-input-wrp-prefix {
+    border: 0;
+    background: transparent;
+    padding-inline-end: 0;
+}
+
+.fi-pagination-records-per-page-select .fi-input-wrp-label {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+}
+
+.fi-pagination-records-per-page-select .fi-select-input {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    padding-block: 0.25rem;
+    padding-inline-start: 0.4rem;
+    cursor: pointer;
+}
+
+.dark .fi-pagination-records-per-page-select .fi-select-input {
+    color: var(--gray-200);
+}
+
+.fi-pagination-records-per-page-select .fi-select-input:hover {
+    color: var(--primary-600);
+}
+
 /* Quick-filter tabs above tables: chips, the active one solid. */
 .fi-tabs {
     background: transparent;
