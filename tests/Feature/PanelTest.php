@@ -32,6 +32,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\RestoreAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -312,6 +313,19 @@ class PanelTest extends TestCase
     {
         $this->get('/admin/does-not-exist')->assertNotFound()->assertSee('ไม่พบหน้าที่ต้องการ');
         $this->actingAs($this->staff)->get(UserResource::getUrl())->assertForbidden()->assertSee('ไม่มีสิทธิ์เข้าถึงหน้านี้');
+    }
+
+    public function test_avatars_are_drawn_in_app_and_the_topbar_names_the_user(): void
+    {
+        $url = filament()->getUserAvatarUrl(User::factory()->create(['name' => 'เอกชัย ใจดี']));
+
+        $this->assertStringStartsWith('data:image/svg+xml;base64,', $url);
+        $this->assertStringContainsString('>อ</text>', base64_decode(Str::after($url, 'base64,')));
+
+        $this->actingAs($this->officer)->get('/admin')
+            ->assertOk()
+            ->assertSeeInOrder(['asset-user-chip-name', e($this->officer->name), 'asset-user-chip-role', 'เจ้าหน้าที่พัสดุ'], false)
+            ->assertDontSee('ui-avatars.com');
     }
 
     public function test_asset_urls_follow_the_https_proxy(): void

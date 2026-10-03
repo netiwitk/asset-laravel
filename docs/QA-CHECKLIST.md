@@ -11,7 +11,7 @@ Checklist มาตรฐานสำหรับเว็บแอป ปรั
 
 **ทดสอบล่าสุด**
 
-- `php artisan test`: 35 tests
+- `php artisan test`: 36 tests
 - `node tests/Browser/smoke.mjs`: 14 ขั้นตอน ทดสอบกับเครื่อง dev, Docker image (production) และเว็บจริงหลัง deploy
 
 ---
@@ -210,6 +210,7 @@ Checklist มาตรฐานสำหรับเว็บแอป ปรั
   - เปิด URL ตรง ๆ ก็ได้ 403 หรือ 404
 - ✅ **Password ไม่เก็บ plain text**: ใช้ cast `hashed`
 - ✅ **Sensitive data ไม่อยู่ใน client**: Livewire ส่งไปที่ client เฉพาะ id ของ model
+- 🛠 **ไม่ส่งข้อมูลผู้ใช้ออกไปเว็บภายนอก**: avatar เดิมดึงจาก ui-avatars.com ซึ่งต้องส่งชื่อผู้ใช้ไปด้วย ตอนนี้วาดเป็น SVG ในระบบเอง
 - ✅ **ป้องกัน XSS**: Blade escape อัตโนมัติ และไม่มี HTML จากผู้ใช้
 - ✅ **ป้องกัน SQL injection**: ใช้ query builder และ binding ทุก query รวมถึง `selectRaw`
 - ➖ **CORS**: ไม่มี API ที่เรียกข้ามโดเมน
@@ -243,7 +244,7 @@ Checklist มาตรฐานสำหรับเว็บแอป ปรั
 ## วิธีทดสอบ
 
 ```bash
-php artisan test                                       # 35 tests: กฎใน database, การกดปุ่มจริงใน UI, สิทธิ์, ข้อความภาษาไทย
+php artisan test                                       # 36 tests: กฎใน database, การกดปุ่มจริงใน UI, สิทธิ์, ข้อความภาษาไทย
 php artisan serve &                                    # ต้องตั้ง APP_DEMO=true
 node tests/Browser/smoke.mjs http://127.0.0.1:8000     # เปิด Chrome จริง: ทุกหน้า, ESC ปิด modal, back/forward, 403/404
 ```

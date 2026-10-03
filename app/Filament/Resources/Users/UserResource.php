@@ -7,17 +7,22 @@ use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 /**
@@ -43,46 +48,66 @@ class UserResource extends Resource
         $isSelf = fn (?User $record): bool => $record?->is(auth()->user()) ?? false;
 
         return $schema
+            ->columns(1)
             ->components([
-                TextInput::make('name')
-                    ->label('ชื่อ-นามสกุล')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->label('อีเมล')
-                    ->email()
-                    ->required()
-                    ->unique(ignoreRecord: true),
-                Select::make('department_id')
-                    ->label('หน่วยงาน')
-                    ->relationship('department', 'name')
-                    ->required(),
-                Select::make('role')
-                    ->label('บทบาท')
-                    ->options(Role::class)
-                    ->default(Role::Staff)
-                    ->required()
-                    ->disabled($isSelf),
-                TextInput::make('password')
-                    ->label('รหัสผ่าน')
-                    ->password()
-                    ->revealable()
-                    ->minLength(8)
-                    ->required(fn (string $operation): bool => $operation === 'create')
-                    ->dehydrated(fn (?string $state): bool => filled($state))
-                    ->helperText(fn (string $operation): ?string => $operation === 'edit' ? 'เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน' : null)
-                    ->confirmed(),
-                TextInput::make('password_confirmation')
-                    ->label('ยืนยันรหัสผ่าน')
-                    ->password()
-                    ->revealable()
-                    ->requiredWith('password')
-                    ->dehydrated(false),
-                Toggle::make('is_active')
-                    ->label('ใช้งานอยู่')
-                    ->helperText('ปิดแทนการลบ ผู้ใช้ที่ปิดแล้วจะเข้าระบบไม่ได้ แต่ประวัติยังอยู่ครบ')
-                    ->default(true)
-                    ->disabled($isSelf),
+                Section::make('ข้อมูลผู้ใช้')
+                    ->contained(false)
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('ชื่อ-นามสกุล')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->label('อีเมล')
+                            ->email()
+                            ->required()
+                            ->unique(ignoreRecord: true),
+                        Select::make('department_id')
+                            ->label('หน่วยงาน')
+                            ->relationship('department', 'name')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Section::make('สิทธิ์การใช้งาน')
+                    ->contained(false)
+                    ->schema([
+                        Radio::make('role')
+                            ->label('บทบาท')
+                            ->options(Role::class)
+                            ->columns(['default' => 1, 'sm' => 3])
+                            ->extraAttributes(['class' => 'asset-role-cards'])
+                            ->default(Role::Staff)
+                            ->required()
+                            ->disabled($isSelf),
+                        Toggle::make('is_active')
+                            ->label('ใช้งานอยู่')
+                            ->helperText('ปิดแทนการลบ ผู้ใช้ที่ปิดแล้วจะเข้าระบบไม่ได้ แต่ประวัติยังอยู่ครบ')
+                            ->default(true)
+                            ->disabled($isSelf),
+                    ]),
+                Section::make('รหัสผ่าน')
+                    ->description(fn (string $operation): ?string => $operation === 'edit' ? 'เว้นว่างไว้ถ้าไม่ต้องการเปลี่ยน' : null)
+                    ->contained(false)
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('password')
+                            ->label('รหัสผ่าน')
+                            ->placeholder('อย่างน้อย 8 ตัวอักษร')
+                            ->password()
+                            ->revealable()
+                            ->minLength(8)
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->confirmed(),
+                        TextInput::make('password_confirmation')
+                            ->label('ยืนยันรหัสผ่าน')
+                            ->placeholder('พิมพ์อีกครั้ง')
+                            ->password()
+                            ->revealable()
+                            ->requiredWith('password')
+                            ->dehydrated(false),
+                    ]),
             ]);
     }
 
@@ -118,7 +143,12 @@ class UserResource extends Resource
                 TernaryFilter::make('is_active')->label('ใช้งานอยู่'),
             ])
             ->recordActions([
-                EditAction::make()->iconButton(),
+                EditAction::make()
+                    ->iconButton()
+                    ->modalHeading('แก้ไขผู้ใช้')
+                    ->modalDescription(fn (User $record): string => "{$record->name} · {$record->email}")
+                    ->modalIcon(fn (User $record): Htmlable => new HtmlString('<img src="'.e(filament()->getUserAvatarUrl($record)).'" alt="" class="asset-modal-avatar">'))
+                    ->modalWidth(Width::TwoExtraLarge),
             ]);
     }
 

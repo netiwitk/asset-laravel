@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\InitialsAvatarProvider;
 use App\Filament\Pages\Dashboard;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,6 +34,14 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.brand'))
             ->favicon(fn (): string => asset('favicon.svg'))
             ->font('IBM Plex Sans Thai')
+            ->defaultAvatarProvider(InitialsAvatarProvider::class)
+            // Name and role beside the avatar, and a richer header inside the menu.
+            ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => view('filament.user-chip'))
+            ->userMenuItems([
+                'profile' => fn (Action $action): Action => $action
+                    ->label(fn () => view('filament.user-menu-header'))
+                    ->icon(null),
+            ])
             // The whole palette: CSS (resources/css/filament/asset-theme.css) and charts read these.
             ->colors([
                 'primary' => Color::Blue,
