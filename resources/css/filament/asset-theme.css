@@ -240,6 +240,16 @@ a.fi-wi-stats-overview-stat:hover,
     color: var(--tone-300);
 }
 
+/* Stat descriptions: one shade darker than Filament's 600 so coloured text passes 4.5:1
+   (green-600 3.22, amber-600 3.20, cyan-600 3.62 -> 700 shades 4.95-5.28). */
+.fi-wi-stats-overview-stat-description.fi-color {
+    color: var(--color-700);
+}
+
+.dark .fi-wi-stats-overview-stat-description.fi-color {
+    color: var(--color-300);
+}
+
 /* Chart cards: same height side by side. The frame height matches the widgets' $maxHeight (280px). */
 .fi-wi-chart,
 .fi-wi-chart > .fi-section {
@@ -261,9 +271,14 @@ a.fi-wi-stats-overview-stat:hover,
     background: transparent;
 }
 
+/* slate-500 on white is 4.76:1 (slate-400 was 2.63:1, below WCAG AA). */
 .fi-ta-header-cell {
     font-size: 0.75rem;
     font-weight: 500;
+    color: var(--gray-500);
+}
+
+.dark .fi-ta-header-cell {
     color: var(--gray-400);
 }
 
@@ -289,8 +304,11 @@ a.fi-wi-stats-overview-stat:hover,
 /* Toolbar search: soft field instead of a boxed input. */
 .fi-ta-header-toolbar .fi-ta-search-field .fi-input-wrp {
     background: var(--gray-50);
-    box-shadow: none;
     border-radius: 0.75rem;
+}
+
+.fi-ta-header-toolbar .fi-ta-search-field .fi-input-wrp:not(:focus-within) {
+    box-shadow: none;
 }
 
 .dark .fi-ta-header-toolbar .fi-ta-search-field .fi-input-wrp {
@@ -325,9 +343,10 @@ a.fi-wi-stats-overview-stat:hover,
     display: none;
 }
 
-/* Row actions: icon buttons, faded until the row is hovered or focused. */
+/* Row actions: icon buttons, slightly faded until the row is hovered or focused.
+   slate-500 at 0.8 opacity is 3.25:1, still above the 3:1 needed for controls. */
 .fi-ta-row .fi-ta-actions {
-    opacity: 0.4;
+    opacity: 0.8;
     transition: opacity 0.15s;
 }
 
@@ -344,6 +363,10 @@ a.fi-wi-stats-overview-stat:hover,
 
 .fi-ta-actions .fi-icon-btn {
     border-radius: 0.5rem;
+    color: var(--gray-500);
+}
+
+.dark .fi-ta-actions .fi-icon-btn {
     color: var(--gray-400);
 }
 
@@ -397,6 +420,9 @@ a.fi-wi-stats-overview-stat:hover,
 
 .fi-pagination-records-per-page-select .fi-input-wrp {
     background: transparent;
+}
+
+.fi-pagination-records-per-page-select .fi-input-wrp:not(:focus-within) {
     box-shadow: none;
 }
 
@@ -408,6 +434,10 @@ a.fi-wi-stats-overview-stat:hover,
 
 .fi-pagination-records-per-page-select .fi-input-wrp-label {
     font-size: 0.8125rem;
+    color: var(--gray-500);
+}
+
+.dark .fi-pagination-records-per-page-select .fi-input-wrp-label {
     color: var(--gray-400);
 }
 
@@ -475,11 +505,57 @@ a.fi-wi-stats-overview-stat:hover,
 
 .fi-btn.fi-color-primary:not(.fi-outlined) {
     background-image: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+}
+
+/* The glow is a box-shadow too, so leave it off while focused: Filament's focus ring is a box-shadow. */
+.fi-btn.fi-color-primary:not(.fi-outlined):not(:focus-visible) {
     box-shadow: 0 6px 16px -8px color-mix(in oklab, var(--primary-600) 70%, transparent);
 }
 
 .fi-btn.fi-color-primary:not(.fi-outlined):hover {
     background-image: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+}
+
+/* Numbers line up in columns and counters. */
+.fi-ta-cell,
+.fi-wi-stats-overview-stat-value,
+.fi-tabs-item .fi-badge,
+.fi-pagination {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Keyboard focus stays visible on everything the theme restyled (outline, so no box-shadow fights). */
+:where(.fi-sidebar-item-btn, .fi-tabs-item, .fi-ta-actions .fi-icon-btn, .fi-pagination-item-btn, a.fi-wi-stats-overview-stat):focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 767px) {
+    /* Quick-filter chips wrap instead of being cut off at the edge. */
+    .fi-tabs {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    /* Rows open the record when tapped, so the separate view/edit links can go; the ⋮ menu stays. */
+    .fi-ta-actions a.fi-ac-icon-btn-action {
+        display: none;
+    }
+
+    .fi-wi-stats-overview-stat-value {
+        font-size: 1.6rem;
+    }
+}
+
+/* Touch screens: 44px hit areas for the small icon buttons and page numbers. */
+@media (pointer: coarse) {
+    .fi-ta-actions .fi-icon-btn,
+    .fi-pagination-item-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -49,10 +49,13 @@ class CategoryResource extends Resource
         return $table
             ->defaultSort('code')
             ->columns([
-                TextColumn::make('code')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
+                TextColumn::make('code')
+                    ->visibleFrom('sm')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
                 TextColumn::make('name')->label('ชื่อหมวดหมู่')->weight(FontWeight::Medium)->searchable(),
-                TextColumn::make('useful_life_years')->label('อายุการใช้งาน (ปี)')->placeholder('-'),
-                TextColumn::make('assets_count')->label('ทรัพย์สิน')->counts('assets')->numeric(),
+                TextColumn::make('useful_life_years')
+                    ->visibleFrom('md')->label('อายุการใช้งาน (ปี)')->placeholder('-'),
+                TextColumn::make('assets_count')
+                    ->visibleFrom('sm')->label('ทรัพย์สิน')->counts('assets')->numeric(),
             ])
             ->recordActions([
                 EditAction::make()->iconButton(),

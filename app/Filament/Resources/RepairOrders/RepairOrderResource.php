@@ -61,6 +61,7 @@ class RepairOrderResource extends Resource
                     ->url(fn (RepairOrder $record): string => AssetResource::getUrl('view', ['record' => $record->asset]))
                     ->searchable(['name', 'asset_tag']),
                 TextColumn::make('vendor')
+                    ->visibleFrom('md')
                     ->label('ร้าน / ผู้รับซ่อม')
                     ->placeholder('-')
                     ->searchable(),
@@ -70,21 +71,25 @@ class RepairOrderResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => $state === 'ซ่อมเสร็จ' ? 'success' : 'warning'),
                 TextColumn::make('sent_on')
+                    ->visibleFrom('md')
                     ->label('วันที่ส่ง')
                     ->formatStateUsing(ThaiDate::formatter())
                     ->sortable(),
                 TextColumn::make('expected_return_on')
+                    ->visibleFrom('lg')
                     ->label('คาดว่าจะได้คืน')
                     ->formatStateUsing(ThaiDate::formatter())
                     ->placeholder('-')
                     ->color(fn (RepairOrder $record): ?string => $record->isOverdue() ? 'danger' : null)
                     ->description(fn (RepairOrder $record): ?string => $record->isOverdue() ? 'เลยกำหนด' : null),
                 TextColumn::make('finished_on')
+                    ->visibleFrom('lg')
                     ->label('วันที่รับคืน')
                     ->formatStateUsing(ThaiDate::formatter())
                     ->placeholder('-')
                     ->sortable(),
                 TextColumn::make('cost')
+                    ->visibleFrom('md')
                     ->label('ค่าซ่อม')
                     ->money('THB')
                     ->placeholder('-'),

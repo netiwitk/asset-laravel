@@ -90,22 +90,26 @@ class LoanResource extends Resource
                     ->description(fn (Loan $record): string => $record->asset->asset_tag)
                     ->searchable(['name', 'asset_tag']),
                 TextColumn::make('borrower.name')
+                    ->visibleFrom('md')
                     ->label('ผู้ยืม')
                     ->searchable(),
                 TextColumn::make('status')
                     ->label('สถานะ')
                     ->badge(),
                 TextColumn::make('requested_at')
+                    ->visibleFrom('lg')
                     ->label('วันที่ขอ')
                     ->formatStateUsing(ThaiDate::formatter())
                     ->sortable(),
                 TextColumn::make('due_on')
+                    ->visibleFrom('sm')
                     ->label('กำหนดคืน')
                     ->formatStateUsing(ThaiDate::formatter())
                     ->sortable()
                     ->color(fn (Loan $record): ?string => $record->isOverdue() ? 'danger' : null)
                     ->description(fn (Loan $record): ?string => $record->isOverdue() ? 'เกินกำหนด' : null),
                 TextColumn::make('approver.name')
+                    ->visibleFrom('lg')
                     ->label('ผู้อนุมัติ')
                     ->placeholder('-')
                     ->toggleable(),

@@ -19,7 +19,7 @@ class AssetStats extends StatsOverviewWidget
     /** The numbers only change on ledger actions; no need to re-query every 5 seconds. */
     protected ?string $pollingInterval = null;
 
-    protected int|array|null $columns = ['md' => 2, 'lg' => 3];
+    protected int|array|null $columns = ['default' => 2, 'lg' => 3];
 
     protected function getStats(): array
     {

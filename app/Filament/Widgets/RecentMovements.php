@@ -47,8 +47,10 @@ class RecentMovements extends TableWidget
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('actor.name')
+                    ->visibleFrom('md')
                     ->label('ผู้บันทึก'),
                 TextColumn::make('note')
+                    ->visibleFrom('lg')
                     ->label('หมายเหตุ')
                     ->placeholder('-')
                     ->limit(50),

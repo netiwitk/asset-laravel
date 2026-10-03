@@ -92,9 +92,11 @@ class UserResource extends Resource
                     ->searchable(['name', 'email'])
                     ->sortable(),
                 TextColumn::make('department.name')
+                    ->visibleFrom('md')
                     ->label('หน่วยงาน')
                     ->placeholder('-'),
                 TextColumn::make('role')
+                    ->visibleFrom('sm')
                     ->label('บทบาท')
                     ->badge(),
                 TextColumn::make('is_active')

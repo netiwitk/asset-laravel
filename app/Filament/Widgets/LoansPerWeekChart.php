@@ -7,6 +7,7 @@ use App\Filament\Resources\Assets\AssetResource;
 use App\Filament\ThaiDate;
 use App\Models\AssetMovement;
 use Filament\Facades\Filament;
+use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 
 class LoansPerWeekChart extends ChartWidget
@@ -14,8 +15,6 @@ class LoansPerWeekChart extends ChartWidget
     protected static ?int $sort = 2;
 
     protected ?string $heading = 'การยืม–คืนรายสัปดาห์';
-
-    protected ?string $description = '8 สัปดาห์ล่าสุด';
 
     protected ?string $maxHeight = '280px';
 
@@ -45,9 +44,31 @@ class LoansPerWeekChart extends ChartWidget
         return $counts;
     }
 
+    /** @var array{borrow: array<string, int>, return: array<string, int>}|null */
+    private ?array $series = null;
+
+    /**
+     * @return array{borrow: array<string, int>, return: array<string, int>}
+     */
+    private function series(): array
+    {
+        return $this->series ??= [
+            'borrow' => self::weeklyCounts(MovementType::Borrow),
+            'return' => self::weeklyCounts(MovementType::Return),
+        ];
+    }
+
+    /**
+     * Shown under the heading and used as the chart's aria-label, so screen readers get the totals.
+     */
+    public function getDescription(): string
+    {
+        return '8 สัปดาห์ล่าสุด · ยืม '.array_sum($this->series()['borrow']).' ครั้ง · คืน '.array_sum($this->series()['return']).' ครั้ง';
+    }
+
     protected function getData(): array
     {
-        $borrows = self::weeklyCounts(MovementType::Borrow);
+        $borrows = $this->series()['borrow'];
         $colors = Filament::getCurrentOrDefaultPanel()->getColors();
 
         return [
@@ -62,7 +83,7 @@ class LoansPerWeekChart extends ChartWidget
                 ],
                 [
                     'label' => 'คืน',
-                    'data' => array_values(self::weeklyCounts(MovementType::Return)),
+                    'data' => array_values($this->series()['return']),
                     'backgroundColor' => $colors['accent'][400],
                     'borderRadius' => 6,
                     'maxBarThickness' => 22,
@@ -72,14 +93,19 @@ class LoansPerWeekChart extends ChartWidget
         ];
     }
 
-    protected function getOptions(): array
+    /**
+     * RawJs so the browser can honour prefers-reduced-motion; maintainAspectRatio off fills the fixed frame.
+     */
+    protected function getOptions(): RawJs
     {
-        return [
-            // Fill the fixed-height frame so both chart cards come out the same size.
-            'maintainAspectRatio' => false,
-            'plugins' => ['legend' => ['position' => 'bottom']],
-            'scales' => ['y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0]]],
-        ];
+        return RawJs::make(<<<'JS'
+            {
+                animation: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : {},
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+            }
+        JS);
     }
 
     protected function getType(): string

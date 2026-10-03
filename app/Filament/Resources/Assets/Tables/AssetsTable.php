@@ -24,6 +24,7 @@ class AssetsTable
             ->defaultSort('asset_tag')
             ->columns([
                 TextColumn::make('asset_tag')
+                    ->visibleFrom('sm')
                     ->label('เลขครุภัณฑ์')
                     ->fontFamily('mono')
                     ->color('gray')
@@ -36,12 +37,15 @@ class AssetsTable
                     ->sortable()
                     ->description(fn ($record): ?string => $record->location_note),
                 TextColumn::make('category.name')
+                    ->visibleFrom('lg')
                     ->label('หมวดหมู่')
                     ->toggleable(),
                 TextColumn::make('department.name')
+                    ->visibleFrom('md')
                     ->label('หน่วยงาน')
                     ->toggleable(),
                 TextColumn::make('condition')
+                    ->visibleFrom('md')
                     ->label('สภาพ')
                     ->badge(),
                 TextColumn::make('availability')

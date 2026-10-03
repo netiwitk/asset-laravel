@@ -57,10 +57,13 @@ class DepartmentResource extends Resource
         return $table
             ->defaultSort('code')
             ->columns([
-                TextColumn::make('code')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
+                TextColumn::make('code')
+                    ->visibleFrom('sm')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
                 TextColumn::make('name')->label('ชื่อหน่วยงาน')->weight(FontWeight::Medium)->searchable(),
-                TextColumn::make('parent.name')->label('สังกัด')->placeholder('-'),
-                TextColumn::make('assets_count')->label('ทรัพย์สิน')->counts('assets')->numeric(),
+                TextColumn::make('parent.name')
+                    ->visibleFrom('md')->label('สังกัด')->placeholder('-'),
+                TextColumn::make('assets_count')
+                    ->visibleFrom('md')->label('ทรัพย์สิน')->counts('assets')->numeric(),
                 TextColumn::make('is_active')->label('สถานะ')->badge()
                     ->formatStateUsing(fn (bool $state): string => $state ? 'ใช้งานอยู่' : 'ปิดใช้งาน')
                     ->color(fn (bool $state): string => $state ? 'success' : 'gray'),

@@ -43,11 +43,14 @@ class MovementsRelationManager extends RelationManager
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('change')
+                    ->visibleFrom('md')
                     ->label('การเปลี่ยนแปลง')
                     ->state(fn (AssetMovement $record): string => self::describeChange($record)),
                 TextColumn::make('actor.name')
+                    ->visibleFrom('lg')
                     ->label('ผู้บันทึก'),
                 TextColumn::make('note')
+                    ->visibleFrom('md')
                     ->label('หมายเหตุ')
                     ->placeholder('-')
                     ->wrap(),
