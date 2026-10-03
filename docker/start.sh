@@ -10,4 +10,8 @@ touch database/database.sqlite
 php artisan migrate:fresh --seed --force
 php artisan optimize
 
-exec frankenphp php-server --root public/ --listen ":${PORT:-8080}"
+# The image's Caddyfile serves public/. Cap PHP threads: FrankenPHP starts 2 per CPU it sees,
+# Render hosts expose many CPUs, and the free plan has only 512 MB of memory.
+export SERVER_NAME=":${PORT:-8080}"
+export FRANKENPHP_CONFIG="${FRANKENPHP_CONFIG:-num_threads 4}"
+exec frankenphp run --config /etc/frankenphp/Caddyfile

@@ -4,6 +4,8 @@
 
 **Laravel 13 · Filament 5 · SQLite · PHPUnit**
 
+**ลองใช้:** https://asset-laravel.onrender.com เลือกบทบาทแล้วเข้าใช้ได้ทันที ข้อมูลเป็นตัวอย่างทั้งหมด (เปิดครั้งแรกอาจต้องรอประมาณ 1 นาที)
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
 ## ทำอะไรได้บ้าง
