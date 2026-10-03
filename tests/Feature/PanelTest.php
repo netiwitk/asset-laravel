@@ -38,6 +38,7 @@ use Filament\Actions\RestoreBulkAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -224,6 +225,41 @@ class PanelTest extends TestCase
             AuditLog::query()->whereIn('event', ['updated', 'deleted', 'restored'])->orderBy('id')->get()
                 ->map(fn (AuditLog $log): array => [$log->auditable_id, $log->event])->all(),
         );
+    }
+
+    public function test_csv_export_follows_the_tab_filter_and_scope_and_defuses_formulas(): void
+    {
+        $formula = AssetLedger::register(['asset_tag' => 'COM-68-0001', 'name' => '=HYPERLINK("http://evil.test")', 'category_id' => $this->category->id, 'custodian_id' => $this->staff->id], $this->it->id, $this->officer);
+        $onLoan = $this->asset($this->it, 'COM-68-0002');
+        $loan = Loan::factory()->for($onLoan)->create();
+        AssetLedger::approve($loan, $this->officer);
+        AssetLedger::handOver($loan, $this->officer);
+        $this->asset($this->finance, 'COM-68-0003');
+
+        $exported = fn (Testable $page): string => base64_decode(data_get($page->callAction('export')->effects, 'download.content'));
+
+        $this->actingAs($this->staff);
+        $csv = $exported(Livewire::test(ListAssets::class));
+        $this->assertStringStartsWith("\u{FEFF}เลขครุภัณฑ์,", $csv);
+        $this->assertStringContainsString("COM-68-0001,\"'=HYPERLINK(\"\"http://evil.test\"\")\",", $csv);
+        $this->assertStringContainsString($this->staff->name, $csv);
+        $this->assertStringContainsString('COM-68-0002', $csv);
+        $this->assertStringNotContainsString('COM-68-0003', $csv);
+
+        $this->actingAs($this->officer);
+        $csv = $exported(Livewire::test(ListAssets::class)->set('activeTab', 'on_loan'));
+        $this->assertSame(['COM-68-0002'], $this->exportedTags($csv));
+
+        $csv = $exported(Livewire::test(ListAssets::class)->filterTable('department', $this->finance->id));
+        $this->assertSame(['COM-68-0003'], $this->exportedTags($csv));
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function exportedTags(string $csv): array
+    {
+        return collect(explode("\n", trim($csv)))->skip(1)->map(fn (string $line): string => str_getcsv($line, escape: '')[0])->values()->all();
     }
 
     public function test_admin_sees_who_changed_an_assets_price_and_other_roles_cannot(): void
