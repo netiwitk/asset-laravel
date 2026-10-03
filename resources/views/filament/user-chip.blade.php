@@ -12,5 +12,7 @@
     x-on:click.stop
 >
     <span class="asset-user-chip-name">{{ $user->name }}</span>
-    <span class="asset-user-chip-role">{{ $user->role->getLabel() }}</span>
+    @if ($user->role->getLabel() !== $user->name)
+        <span class="asset-user-chip-role">{{ $user->role->getLabel() }}</span>
+    @endif
 </button>
