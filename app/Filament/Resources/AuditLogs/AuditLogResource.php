@@ -89,19 +89,19 @@ class AuditLogResource extends Resource
             ->emptyStateDescription('ทุกครั้งที่สร้าง แก้ไข หรือลบ ทรัพย์สิน ผู้ใช้ หมวดหมู่ หรือหน่วยงาน จะมีบันทึกที่นี่')
             // Only assets are soft-deleted; their audit rows must still name them.
             ->modifyQueryUsing(fn (Builder $query) => $query->with([
+                'actor',
                 'auditable' => fn (MorphTo $morphTo) => $morphTo->constrain([
                     Asset::class => fn (Builder $assets) => $assets->withTrashed(),
                 ]),
             ]))
             ->columns([
+                // Who and what are the point of this page, so they stay visible on a phone.
                 TextColumn::make('created_at')
-                    ->label('เวลา')
-                    ->formatStateUsing(ThaiDate::formatter(withTime: true)),
-                TextColumn::make('actor.name')
-                    ->visibleFrom('md')
-                    ->label('ผู้ทำรายการ')
-                    ->placeholder('ระบบ'),
+                    ->label('เวลา / ผู้ทำรายการ')
+                    ->formatStateUsing(ThaiDate::formatter(withTime: true))
+                    ->description(fn (AuditLog $record): string => $record->actor->name ?? 'ระบบ'),
                 TextColumn::make('event')
+                    ->visibleFrom('sm')
                     ->label('รายการ')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => self::EVENTS[$state] ?? $state)
@@ -119,7 +119,6 @@ class AuditLogResource extends Resource
                         ? AssetResource::getUrl('view', ['record' => $record->auditable])
                         : null),
                 TextColumn::make('diff')
-                    ->visibleFrom('md')
                     ->label('การเปลี่ยนแปลง')
                     ->state(fn (AuditLog $record): array => self::describeDiff($record))
                     ->listWithLineBreaks()
