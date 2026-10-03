@@ -16,7 +16,7 @@ class AssetsByCategoryChart extends ChartWidget
 
     protected ?string $description = 'ไม่นับรายการที่จำหน่ายแล้ว';
 
-    protected ?string $maxHeight = '260px';
+    protected ?string $maxHeight = '280px';
 
     protected ?string $pollingInterval = null;
 
@@ -47,6 +47,7 @@ class AssetsByCategoryChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            'maintainAspectRatio' => false,
             'cutout' => '64%',
             'plugins' => ['legend' => ['position' => 'bottom']],
             'scales' => ['x' => ['display' => false], 'y' => ['display' => false]],

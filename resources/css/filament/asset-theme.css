@@ -193,19 +193,27 @@
     box-shadow: var(--asset-shadow);
 }
 
+/* Each stat card carries asset-tone-{color} (see AssetStats::stat) to tint its icon and top bar. */
 .fi-wi-stats-overview-stat {
+    --tone-300: var(--primary-300);
+    --tone-500: var(--primary-500);
+    --tone-600: var(--primary-600);
     position: relative;
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
 }
+
+.asset-tone-success { --tone-300: var(--success-300); --tone-500: var(--success-500); --tone-600: var(--success-600); }
+.asset-tone-danger { --tone-300: var(--danger-300); --tone-500: var(--danger-500); --tone-600: var(--danger-600); }
+.asset-tone-warning { --tone-300: var(--warning-300); --tone-500: var(--warning-500); --tone-600: var(--warning-600); }
+.asset-tone-accent { --tone-300: var(--accent-300); --tone-500: var(--accent-500); --tone-600: var(--accent-600); }
 
 .fi-wi-stats-overview-stat::before {
     content: "";
     position: absolute;
     inset: 0 0 auto 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--primary-500), var(--accent-400));
-    opacity: 0.85;
+    background: linear-gradient(90deg, var(--tone-500), color-mix(in oklab, var(--tone-500) 25%, transparent));
 }
 
 a.fi-wi-stats-overview-stat:hover,
@@ -224,12 +232,22 @@ a.fi-wi-stats-overview-stat:hover,
     height: 2rem;
     padding: 0.4rem;
     border-radius: 0.6rem;
-    color: var(--primary-600);
-    background: color-mix(in oklab, var(--primary-500) 12%, transparent);
+    color: var(--tone-600);
+    background: color-mix(in oklab, var(--tone-500) 13%, transparent);
 }
 
 .dark .fi-wi-stats-overview-stat-label-ctn .fi-icon {
-    color: var(--primary-300);
+    color: var(--tone-300);
+}
+
+/* Chart cards: same height side by side. The frame height matches the widgets' $maxHeight (280px). */
+.fi-wi-chart,
+.fi-wi-chart > .fi-section {
+    height: 100%;
+}
+
+.fi-wi-chart .fi-wi-chart-canvas-ctn {
+    height: 280px;
 }
 
 /* Tables */

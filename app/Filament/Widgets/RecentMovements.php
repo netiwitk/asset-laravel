@@ -6,6 +6,7 @@ use App\Filament\Resources\Assets\AssetResource;
 use App\Filament\ThaiDate;
 use App\Models\AssetMovement;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,9 +26,11 @@ class RecentMovements extends TableWidget
                 ->whereIn('asset_id', AssetResource::getEloquentQuery()->select('id'))
                 ->with(['asset', 'actor'])
                 ->latest('occurred_at')
-                ->latest('id')
-                ->limit(8))
-            ->paginated(false)
+                ->latest('id'))
+            // TableWidget defaults to simple (next/previous only); show page numbers and the total.
+            ->paginationMode(PaginationMode::Default)
+            ->paginated([10])
+            ->defaultPaginationPageOption(10)
             ->columns([
                 TextColumn::make('occurred_at')
                     ->label('เวลา')

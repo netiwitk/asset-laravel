@@ -17,7 +17,7 @@ class LoansPerWeekChart extends ChartWidget
 
     protected ?string $description = '8 สัปดาห์ล่าสุด';
 
-    protected ?string $maxHeight = '260px';
+    protected ?string $maxHeight = '280px';
 
     protected ?string $pollingInterval = null;
 
@@ -75,6 +75,8 @@ class LoansPerWeekChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
+            // Fill the fixed-height frame so both chart cards come out the same size.
+            'maintainAspectRatio' => false,
             'plugins' => ['legend' => ['position' => 'bottom']],
             'scales' => ['y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0]]],
         ];

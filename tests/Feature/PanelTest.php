@@ -256,7 +256,7 @@ class PanelTest extends TestCase
         AssetLedger::handOver($loan, $this->officer);
 
         $this->actingAs($this->officer);
-        Livewire::test(AssetStats::class)->assertSee('เกินกำหนดคืน 1 รายการ');
+        Livewire::test(AssetStats::class)->assertSee('เกินกำหนดคืน')->assertSee('ต้องติดตามให้คืน');
         Livewire::test(RecentMovements::class)->assertCanSeeTableRecords($asset->movements);
         Livewire::test(LoansPerWeekChart::class)->assertOk();
         Livewire::test(AssetsByCategoryChart::class)->assertOk();

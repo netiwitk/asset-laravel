@@ -19,7 +19,7 @@ class AssetStats extends StatsOverviewWidget
     /** The numbers only change on ledger actions; no need to re-query every 5 seconds. */
     protected ?string $pollingInterval = null;
 
-    protected int|array|null $columns = ['md' => 3, 'xl' => 5];
+    protected int|array|null $columns = ['md' => 2, 'lg' => 3];
 
     protected function getStats(): array
     {
@@ -42,31 +42,36 @@ class AssetStats extends StatsOverviewWidget
         $pending = (clone $loans)->where('status', LoanStatus::Pending)->count();
         $overdue = (clone $loans)->overdue()->count();
 
+        $borrows = LoansPerWeekChart::weeklyCounts(MovementType::Borrow);
+
         return [
-            Stat::make('ทรัพย์สินในทะเบียน', number_format((int) $assets->in_register))
-                ->description('มูลค่ารวม ฿'.number_format((float) $assets->total_cost))
-                ->color('primary')
-                ->icon(Heroicon::OutlinedCube),
-            Stat::make('พร้อมให้ยืม', number_format((int) $assets->ready))
-                ->description('ใช้งานได้และว่าง')
-                ->color('success')
-                ->icon(Heroicon::OutlinedCheckCircle),
-            Stat::make('ถูกยืมอยู่', number_format((int) $assets->on_loan))
-                ->description($overdue > 0 ? "เกินกำหนดคืน {$overdue} รายการ" : 'ไม่มีรายการเกินกำหนด')
-                ->descriptionColor($overdue > 0 ? 'danger' : 'gray')
-                ->color('primary')
-                ->chart(array_values(LoansPerWeekChart::weeklyCounts(MovementType::Borrow)))
-                ->icon(Heroicon::OutlinedHandRaised),
-            Stat::make('ซ่อม / ชำรุด', number_format((int) $assets->in_repair).' / '.number_format((int) $assets->waiting_repair))
-                ->description('กำลังซ่อม / ชำรุดรอส่งซ่อม')
-                ->color('warning')
-                ->chart(array_values(LoansPerWeekChart::weeklyCounts(MovementType::SendRepair)))
-                ->icon(Heroicon::OutlinedWrenchScrewdriver),
-            Stat::make('คำขอรออนุมัติ', number_format($pending))
+            $this->stat('ทรัพย์สินในทะเบียน', $assets->in_register, 'primary', Heroicon::OutlinedCube)
+                ->description('มูลค่ารวม ฿'.number_format((float) $assets->total_cost)),
+            $this->stat('พร้อมให้ยืม', $assets->ready, 'success', Heroicon::OutlinedCheckCircle)
+                ->description('ใช้งานได้และว่างอยู่'),
+            $this->stat('ถูกยืมอยู่', $assets->on_loan, 'primary', Heroicon::OutlinedHandRaised)
+                ->description('ยืมออก '.array_sum($borrows).' ครั้งใน 8 สัปดาห์')
+                ->chart(array_values($borrows)),
+            $this->stat('เกินกำหนดคืน', $overdue, $overdue > 0 ? 'danger' : 'success', Heroicon::OutlinedExclamationTriangle)
+                ->description($overdue > 0 ? 'ต้องติดตามให้คืน' : 'ไม่มีรายการค้างคืน')
+                ->url(LoanResource::getUrl()),
+            $this->stat('กำลังซ่อม', $assets->in_repair, 'warning', Heroicon::OutlinedWrenchScrewdriver)
+                ->description('ชำรุดรอส่งซ่อมอีก '.number_format((int) $assets->waiting_repair).' รายการ')
+                ->chart(array_values(LoansPerWeekChart::weeklyCounts(MovementType::SendRepair))),
+            $this->stat('คำขอรออนุมัติ', $pending, 'accent', Heroicon::OutlinedClipboardDocumentList)
                 ->description('คำขอยืมที่ยังไม่ได้พิจารณา')
-                ->url(LoanResource::getUrl())
-                ->color('accent')
-                ->icon(Heroicon::OutlinedClipboardDocumentList),
+                ->url(LoanResource::getUrl()),
         ];
+    }
+
+    /**
+     * The asset-tone-* class lets the theme tint the icon and top bar to match the card.
+     */
+    private function stat(string $label, int|string|null $value, string $tone, Heroicon $icon): Stat
+    {
+        return Stat::make($label, number_format((int) $value))
+            ->color($tone)
+            ->icon($icon)
+            ->extraAttributes(['class' => "asset-tone-{$tone}"]);
     }
 }
