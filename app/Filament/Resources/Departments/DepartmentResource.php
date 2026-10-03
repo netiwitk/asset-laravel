@@ -11,8 +11,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -58,13 +58,15 @@ class DepartmentResource extends Resource
             ->defaultSort('code')
             ->columns([
                 TextColumn::make('code')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
-                TextColumn::make('name')->label('ชื่อหน่วยงาน')->searchable(),
+                TextColumn::make('name')->label('ชื่อหน่วยงาน')->weight(FontWeight::Medium)->searchable(),
                 TextColumn::make('parent.name')->label('สังกัด')->placeholder('-'),
                 TextColumn::make('assets_count')->label('ทรัพย์สิน')->counts('assets')->numeric(),
-                IconColumn::make('is_active')->label('ใช้งาน')->boolean(),
+                TextColumn::make('is_active')->label('สถานะ')->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'ใช้งานอยู่' : 'ปิดใช้งาน')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->iconButton(),
             ]);
     }
 

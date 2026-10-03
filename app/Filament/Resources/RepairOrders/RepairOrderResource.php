@@ -10,10 +10,9 @@ use App\Models\Asset;
 use App\Models\RepairOrder;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -57,6 +56,7 @@ class RepairOrderResource extends Resource
             ->columns([
                 TextColumn::make('asset.name')
                     ->label('ทรัพย์สิน')
+                    ->weight(FontWeight::Medium)
                     ->description(fn (RepairOrder $record): string => $record->asset->asset_tag)
                     ->url(fn (RepairOrder $record): string => AssetResource::getUrl('view', ['record' => $record->asset]))
                     ->searchable(['name', 'asset_tag']),
@@ -97,22 +97,8 @@ class RepairOrderResource extends Resource
                     ->limit(40)
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                TernaryFilter::make('finished')
-                    ->label('สถานะ')
-                    ->placeholder('ทั้งหมด')
-                    ->trueLabel('ซ่อมเสร็จ')
-                    ->falseLabel('กำลังซ่อม')
-                    ->queries(
-                        true: fn (Builder $query) => $query->whereNotNull('finished_on'),
-                        false: fn (Builder $query) => $query->whereNull('finished_on'),
-                    ),
-                Filter::make('overdue')
-                    ->label('เลยกำหนดรับคืน')
-                    ->query(fn (Builder $query) => $query->overdue()),
-            ])
             ->recordActions([
-                AssetActions::receiveFromRepair(fn (RepairOrder $record): Asset => $record->asset),
+                AssetActions::receiveFromRepair(fn (RepairOrder $record): Asset => $record->asset)->iconButton(),
             ]);
     }
 

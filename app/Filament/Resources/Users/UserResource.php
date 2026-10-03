@@ -12,8 +12,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -87,6 +87,7 @@ class UserResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->label('ชื่อ-นามสกุล')
+                    ->weight(FontWeight::Medium)
                     ->description(fn (User $record): string => $record->email)
                     ->searchable(['name', 'email'])
                     ->sortable(),
@@ -96,9 +97,11 @@ class UserResource extends Resource
                 TextColumn::make('role')
                     ->label('บทบาท')
                     ->badge(),
-                IconColumn::make('is_active')
-                    ->label('ใช้งาน')
-                    ->boolean(),
+                TextColumn::make('is_active')
+                    ->label('สถานะ')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'ใช้งานอยู่' : 'ปิดใช้งาน')
+                    ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
             ])
             ->filters([
                 SelectFilter::make('role')->label('บทบาท')->options(Role::class),
@@ -106,7 +109,7 @@ class UserResource extends Resource
                 TernaryFilter::make('is_active')->label('ใช้งานอยู่'),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->iconButton(),
             ]);
     }
 

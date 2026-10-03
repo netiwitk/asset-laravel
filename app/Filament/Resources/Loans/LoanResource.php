@@ -19,10 +19,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -87,6 +86,7 @@ class LoanResource extends Resource
             ->columns([
                 TextColumn::make('asset.name')
                     ->label('ทรัพย์สิน')
+                    ->weight(FontWeight::Medium)
                     ->description(fn (Loan $record): string => $record->asset->asset_tag)
                     ->searchable(['name', 'asset_tag']),
                 TextColumn::make('borrower.name')
@@ -113,12 +113,6 @@ class LoanResource extends Resource
                     ->label('วัตถุประสงค์')
                     ->limit(40)
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('status')->label('สถานะ')->options(LoanStatus::class),
-                Filter::make('overdue')
-                    ->label('เกินกำหนดคืน')
-                    ->query(fn (Builder $query) => $query->overdue()),
             ])
             ->recordActions([
                 ActionGroup::make([

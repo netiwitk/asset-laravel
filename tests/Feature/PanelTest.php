@@ -266,4 +266,25 @@ class PanelTest extends TestCase
         $this->assertSame(1, array_sum($weeks));
         $this->assertSame(1, end($weeks), 'This week\'s hand-over lands in the last bucket.');
     }
+
+    public function test_quick_filter_tabs_narrow_the_tables(): void
+    {
+        $idle = $this->asset($this->finance, 'COM-68-0001');
+        $onLoan = $this->asset($this->finance, 'COM-68-0002');
+        $loan = Loan::factory()->for($onLoan)->create(['due_on' => today()->subDay()]);
+        AssetLedger::approve($loan, $this->officer);
+        AssetLedger::handOver($loan, $this->officer);
+        $pending = Loan::factory()->for($idle)->create();
+
+        $this->actingAs($this->officer);
+        Livewire::test(ListAssets::class)
+            ->set('activeTab', 'on_loan')
+            ->assertCanSeeTableRecords([$onLoan])
+            ->assertCanNotSeeTableRecords([$idle]);
+
+        Livewire::test(ManageLoans::class)
+            ->set('activeTab', 'overdue')
+            ->assertCanSeeTableRecords([$loan])
+            ->assertCanNotSeeTableRecords([$pending]);
+    }
 }

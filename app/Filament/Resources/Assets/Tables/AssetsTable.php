@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources\Assets\Tables;
 
-use App\Enums\Availability;
-use App\Enums\Condition;
 use App\Filament\Resources\Assets\AssetActions;
 use App\Filament\ThaiDate;
 use Filament\Actions\ActionGroup;
@@ -12,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -27,10 +26,12 @@ class AssetsTable
                 TextColumn::make('asset_tag')
                     ->label('เลขครุภัณฑ์')
                     ->fontFamily('mono')
+                    ->color('gray')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
                     ->label('ชื่อทรัพย์สิน')
+                    ->weight(FontWeight::Medium)
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record): ?string => $record->location_note),
@@ -61,15 +62,13 @@ class AssetsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('availability')->label('การใช้งาน')->options(Availability::class),
-                SelectFilter::make('condition')->label('สภาพ')->options(Condition::class),
                 SelectFilter::make('department')->label('หน่วยงาน')->relationship('department', 'name'),
                 SelectFilter::make('category')->label('หมวดหมู่')->relationship('category', 'name'),
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()->iconButton(),
+                EditAction::make()->iconButton(),
                 ActionGroup::make(AssetActions::all()),
             ])
             ->toolbarActions([

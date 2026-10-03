@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Filament\Resources\Assets\AssetResource;
 use App\Filament\ThaiDate;
 use App\Models\AssetMovement;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Table;
@@ -38,6 +39,7 @@ class RecentMovements extends TableWidget
                     ->tooltip(fn (AssetMovement $record): ?string => ThaiDate::format($record->occurred_at, withTime: true)),
                 TextColumn::make('asset.name')
                     ->label('ทรัพย์สิน')
+                    ->weight(FontWeight::Medium)
                     ->description(fn (AssetMovement $record): string => $record->asset->asset_tag)
                     ->url(fn (AssetMovement $record): string => AssetResource::getUrl('view', ['record' => $record->asset])),
                 TextColumn::make('type')

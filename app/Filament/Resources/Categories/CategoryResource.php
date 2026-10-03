@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -49,12 +50,12 @@ class CategoryResource extends Resource
             ->defaultSort('code')
             ->columns([
                 TextColumn::make('code')->label('รหัส')->fontFamily('mono')->searchable()->sortable(),
-                TextColumn::make('name')->label('ชื่อหมวดหมู่')->searchable(),
+                TextColumn::make('name')->label('ชื่อหมวดหมู่')->weight(FontWeight::Medium)->searchable(),
                 TextColumn::make('useful_life_years')->label('อายุการใช้งาน (ปี)')->placeholder('-'),
                 TextColumn::make('assets_count')->label('ทรัพย์สิน')->counts('assets')->numeric(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->iconButton(),
             ]);
     }
 
