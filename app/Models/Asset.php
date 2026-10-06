@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -61,6 +62,14 @@ class Asset extends Model
     public function repairOrders(): HasMany
     {
         return $this->hasMany(RepairOrder::class);
+    }
+
+    /**
+     * The approved or handed-over loan. A partial unique index allows at most one.
+     */
+    public function activeLoan(): HasOne
+    {
+        return $this->hasOne(Loan::class)->whereIn('status', [LoanStatus::Approved, LoanStatus::HandedOver]);
     }
 
     /**

@@ -13,6 +13,8 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -51,5 +53,8 @@ class AppServiceProvider extends ServiceProvider
             }
         }
         Asset::restored(fn (Asset $asset) => AuditLog::record($asset, 'restored'));
+
+        // A deactivated user's scanner tokens stop working at once, like their web login.
+        Sanctum::authenticateAccessTokensUsing(fn (PersonalAccessToken $token, bool $isValid): bool => $isValid && $token->tokenable->is_active);
     }
 }
