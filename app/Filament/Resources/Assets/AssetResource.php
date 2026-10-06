@@ -70,10 +70,7 @@ class AssetResource extends Resource
      */
     public static function getEloquentQuery(): Builder
     {
-        $user = auth()->user();
-
-        return parent::getEloquentQuery()
-            ->when(! $user->isOfficer(), fn (Builder $query) => $query->where('department_id', $user->department_id));
+        return parent::getEloquentQuery()->visibleTo(auth()->user());
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

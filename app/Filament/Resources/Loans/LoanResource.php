@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Loans;
 
 use App\Enums\Availability;
 use App\Enums\Condition;
+use App\Enums\LoanAction;
 use App\Enums\LoanStatus;
 use App\Filament\Resources\Assets\AssetActions;
 use App\Filament\Resources\Loans\Pages\ManageLoans;
@@ -51,7 +52,7 @@ class LoanResource extends Resource
                     ->relationship('asset', 'name', fn (Builder $query) => $query
                         ->where('condition', Condition::Usable)
                         ->where('availability', Availability::Available)
-                        ->when(! $user->isOfficer(), fn (Builder $query) => $query->where('department_id', $user->department_id)))
+                        ->visibleTo($user))
                     ->getOptionLabelFromRecordUsing(fn (Asset $record): string => "{$record->asset_tag} · {$record->name}")
                     ->searchable(['asset_tag', 'name'])
                     ->helperText('แสดงเฉพาะทรัพย์สินที่ใช้งานได้และว่างอยู่')
@@ -176,7 +177,7 @@ class LoanResource extends Resource
             ->icon(Heroicon::OutlinedCheckCircle)
             ->color('success')
             ->requiresConfirmation()
-            ->visible(fn (Loan $record): bool => auth()->user()->isOfficer() && $record->status === LoanStatus::Pending)
+            ->visible(fn (Loan $record): bool => LoanAction::Approve->allows(auth()->user(), $record))
             ->action(fn (Loan $record, Action $action) => AssetActions::run($action, fn () => AssetLedger::approve($record, auth()->user())))
             ->successNotificationTitle('อนุมัติแล้ว');
     }
@@ -188,7 +189,7 @@ class LoanResource extends Resource
             ->icon(Heroicon::OutlinedXCircle)
             ->color('danger')
             ->requiresConfirmation()
-            ->visible(fn (Loan $record): bool => auth()->user()->isOfficer() && $record->status === LoanStatus::Pending)
+            ->visible(fn (Loan $record): bool => LoanAction::Reject->allows(auth()->user(), $record))
             ->action(fn (Loan $record, Action $action) => AssetActions::run($action, fn () => AssetLedger::reject($record, auth()->user())))
             ->successNotificationTitle('ปฏิเสธคำขอแล้ว');
     }
@@ -201,7 +202,7 @@ class LoanResource extends Resource
             ->color('primary')
             ->requiresConfirmation()
             ->modalDescription('สถานะทรัพย์สินจะเปลี่ยนเป็น "ถูกยืม" ตอนส่งมอบ ไม่ใช่ตอนอนุมัติ')
-            ->visible(fn (Loan $record): bool => auth()->user()->isOfficer() && $record->status === LoanStatus::Approved)
+            ->visible(fn (Loan $record): bool => LoanAction::HandOver->allows(auth()->user(), $record))
             ->action(fn (Loan $record, Action $action) => AssetActions::run($action, fn () => AssetLedger::handOver($record, auth()->user())))
             ->successNotificationTitle('ส่งมอบแล้ว');
     }
@@ -212,7 +213,7 @@ class LoanResource extends Resource
             ->label('รับคืน')
             ->icon(Heroicon::OutlinedArrowUturnLeft)
             ->color('success')
-            ->visible(fn (Loan $record): bool => auth()->user()->isOfficer() && $record->status === LoanStatus::HandedOver)
+            ->visible(fn (Loan $record): bool => LoanAction::ReceiveReturn->allows(auth()->user(), $record))
             ->schema([
                 AssetActions::conditionSelect('สภาพตอนคืน'),
                 Textarea::make('note')->label('บันทึก'),
@@ -230,8 +231,7 @@ class LoanResource extends Resource
             ->icon(Heroicon::OutlinedXCircle)
             ->color('gray')
             ->requiresConfirmation()
-            ->visible(fn (Loan $record): bool => in_array($record->status, [LoanStatus::Pending, LoanStatus::Approved], true)
-                && (auth()->user()->isOfficer() || $record->requester_id === auth()->id()))
+            ->visible(fn (Loan $record): bool => LoanAction::Cancel->allows(auth()->user(), $record))
             ->action(fn (Loan $record, Action $action) => AssetActions::run($action, fn () => AssetLedger::cancel($record)))
             ->successNotificationTitle('ยกเลิกแล้ว');
     }

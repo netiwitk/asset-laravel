@@ -9,7 +9,7 @@ use Illuminate\Auth\Access\Response;
 /**
  * Filament asks this policy for every button (edit, delete, bulk delete, restore),
  * so the rules live here rather than in the resource. Staff visibility by department
- * is a query scope in AssetResource::getEloquentQuery().
+ * is the Asset::visibleTo() query scope.
  */
 class AssetPolicy
 {
