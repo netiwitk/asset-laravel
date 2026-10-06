@@ -6,6 +6,7 @@ use App\Enums\LoanAction;
 use App\Filament\ThaiDate;
 use App\Models\Asset;
 use BackedEnum;
+use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,7 +28,8 @@ class ScannedAssetResource extends JsonResource
     public function toArray(Request $request): array
     {
         $loan = $this->activeLoan;
-        $labelled = fn (BackedEnum&HasLabel $state): array => ['value' => $state->value, 'label' => $state->getLabel()];
+        // tone is the web panel's badge colour name (success, warning, info...), so the app colours a status the same way.
+        $labelled = fn (BackedEnum&HasColor&HasLabel $state): array => ['value' => $state->value, 'label' => $state->getLabel(), 'tone' => $state->getColor()];
 
         return [
             'tag' => $this->asset_tag,

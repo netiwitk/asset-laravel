@@ -137,7 +137,7 @@ class ScannerApiTest extends TestCase
 
         $this->postJson(self::URL.'/hand-over')
             ->assertOk()
-            ->assertJsonPath('data.availability.value', 'on_loan')
+            ->assertJsonPath('data.availability', ['value' => 'on_loan', 'label' => 'ถูกยืม', 'tone' => 'info'])
             ->assertJsonPath('data.actions', ['receive_return']);
 
         $this->postJson(self::URL.'/receive-return', ['condition' => Condition::Damaged->value, 'note' => 'จอแตก'])
